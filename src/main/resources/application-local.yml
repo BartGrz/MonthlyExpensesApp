@@ -1,0 +1,16 @@
+spring:
+  flyway:
+    baseline-on-migrate: true
+  h2.console:
+    enabled: true
+    path: '/console'
+  datasource :
+    url: 'jdbc:h2:file:~/deaProjects\MonthlyExpensesApp/monthlyExpenses.db'
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      hibernate:
+        dialect=org:
+          hibernate:
+            dialect:
+              H2Dialect:
