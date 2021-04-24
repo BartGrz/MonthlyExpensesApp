@@ -5,7 +5,8 @@
 ### [Web app still in development] 
 
 * ### Languages : 
-  * #### Java 11 text
+  * #### Java 11 
+    * ##### Project Lombok
   * #### JavaScript
 * ### Frameworks : 
   * #### Spring 5 
@@ -17,4 +18,5 @@
   * #### Maven
   * #### Flyway
   * #### JUnit 5
-
+* ### Templates Engine
+  * #### Thymeleaf
