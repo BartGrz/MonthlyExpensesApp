@@ -10,6 +10,7 @@
   * #### JavaScript
 * ### Frameworks : 
   * #### Spring 5 
+  * #### Spring Boot 2
   * #### Hibernate 5
   * #### Lombok
 * ### Database
