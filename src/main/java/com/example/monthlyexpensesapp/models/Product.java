@@ -3,9 +3,12 @@ package com.example.monthlyexpensesapp.models;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+
 
 @Entity
 @Table(name = "product")
@@ -14,7 +17,6 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
-    @NonNull
     private int id_product;
     @NotBlank(message = "field cannot be empty")
     @Getter
@@ -22,11 +24,33 @@ public class Product {
     private String product_name;
     @Getter
     @Setter
+    private double product_price;
+    @Getter
+    @Setter
     private String product_note;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @Getter
+    @Setter
+    private boolean product_common;
+    @ManyToOne
     @JoinColumn(name = "id_category")
+    @Getter
+    @Setter
     private Category category;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_products_group")
-    private ProductsGroup productsGroup;
+    @ManyToOne
+    @JoinColumn(name = "id_bill")
+    @Getter
+    @Setter
+    private Bill bill;
+
+    public void updateFrom(Product source) {
+
+        this.product_name = source.product_name;
+        this.product_note = source.product_note;
+        this.product_common = source.product_common;
+        this.product_price = source.product_price;
+
+
+    }
+
+
 }

@@ -1,7 +1,7 @@
 package com.example.monthlyexpensesapp.controllers;
 
 import com.example.monthlyexpensesapp.models.Account;
-import com.example.monthlyexpensesapp.models.AccountRepository;
+import com.example.monthlyexpensesapp.adapter.AccountRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.any;

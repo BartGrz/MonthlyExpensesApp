@@ -1,7 +1,7 @@
 package com.example.monthlyexpensesapp.controllers;
 
 import com.example.monthlyexpensesapp.models.Account;
-import com.example.monthlyexpensesapp.models.AccountRepository;
+import com.example.monthlyexpensesapp.adapter.AccountRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 public class AccountController {
 
-    private AccountRepository accountRepository;
+   private AccountRepository accountRepository;
 
     public AccountController(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
@@ -34,9 +34,9 @@ public class AccountController {
     @PostMapping("/account")
     ResponseEntity<Account> createAccount(@RequestBody Account toCreate) {
 
-        Account restult = accountRepository.save(toCreate);
+        Account result = accountRepository.save(toCreate);
 
-        return ResponseEntity.created(URI.create("/" + restult.getId_account())).body(toCreate);
+        return ResponseEntity.created(URI.create("/" + result.getId_account())).body(toCreate);
     }
 
     @PutMapping("/account/{id}")

@@ -1,8 +1,8 @@
 package com.example.monthlyexpensesapp.controllers;
 
+import com.example.monthlyexpensesapp.adapter.CategoryRepository;
 import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.models.Category;
-import com.example.monthlyexpensesapp.models.CategoryRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

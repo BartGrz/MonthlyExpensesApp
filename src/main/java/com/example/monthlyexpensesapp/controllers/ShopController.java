@@ -1,7 +1,7 @@
 package com.example.monthlyexpensesapp.controllers;
 
 import com.example.monthlyexpensesapp.models.Shop;
-import com.example.monthlyexpensesapp.models.ShopRepository;
+import com.example.monthlyexpensesapp.adapter.ShopRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

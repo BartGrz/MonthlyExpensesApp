@@ -2,31 +2,42 @@ package com.example.monthlyexpensesapp.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.relational.core.mapping.Embedded;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
-@Table(name = "products_group")
-public class ProductsGroup {
+@Table(name = "bill")
+public class Bill {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
     @Getter
-    private int id_products_group;
-    @ManyToOne(cascade = CascadeType.ALL)
+    private int id_bill;
+    @ManyToOne
     @Getter
     @Setter
     @JoinColumn(name = "id_shop")
     private Shop shop;
     @Getter
     @Setter
-    private LocalDate products_group_date;
+    private LocalDate group_date;
+    @ManyToOne
+    @JoinColumn(name = "id_account")
+    @Getter
+    @Setter
+    private Account account;
+    @OneToMany(mappedBy = "bill")
+    @Getter
+    @Setter
+    private Set<Product> products;
+
 
 
 }

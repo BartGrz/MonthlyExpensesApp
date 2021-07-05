@@ -7,6 +7,7 @@ spring:
   datasource :
     url: 'jdbc:h2:file:~/deaProjects\MonthlyExpensesApp/monthlyExpenses.db'
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
       hibernate:
@@ -14,3 +15,4 @@ spring:
           hibernate:
             dialect:
               H2Dialect:
+

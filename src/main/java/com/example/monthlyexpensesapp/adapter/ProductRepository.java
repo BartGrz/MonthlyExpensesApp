@@ -1,7 +1,6 @@
 package com.example.monthlyexpensesapp.adapter;
 
 import com.example.monthlyexpensesapp.models.Product;
-import com.example.monthlyexpensesapp.models.ProductRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SqlProductRepository extends ProductRepository, JpaRepository<Product,Integer> {
+public interface ProductRepository extends JpaRepository<Product,Integer> {
 
 
 

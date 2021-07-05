@@ -1,7 +1,7 @@
 package com.example.monthlyexpensesapp.controllers;
 
 import com.example.monthlyexpensesapp.models.Category;
-import com.example.monthlyexpensesapp.models.CategoryRepository;
+import com.example.monthlyexpensesapp.adapter.CategoryRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
