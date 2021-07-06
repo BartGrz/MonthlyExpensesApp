@@ -53,13 +53,13 @@ public class BillWriteModel {
         bill.setAccount(account);
         bill.setShop(shop);
         bill.setGroup_date(date);
-        Bill created = billRepository.save(bill);
+        billRepository.save(bill);
         logger.info("Bill created and saved " + bill.getId_bill());
         toCreate.setCategory(category);
         toCreate.setBill(bill);
         var product = productRepository.save(toCreate);
 
-        logger.info("product created and added to bill  " + product.getId_product() );
+        logger.info("product created and added to bill  " + product.getId_product());
 
         return product;
     }

@@ -6,6 +6,7 @@ import com.example.monthlyexpensesapp.services.ProductService;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Optional;
@@ -37,9 +38,10 @@ class BillWriteModelTest {
         product.setProduct_common(true);
         product.setProduct_note("foo");
 
-        var bill = mock(Bill.class);
-        bill.setProducts(products);
-
+        var bill = new Bill();
+        Field getBillId = bill.getClass().getDeclaredField("id_bill");
+        getBillId.setAccessible(true);
+        getBillId.set(bill,1);
 
         var shop = new Shop();
         shop.setShop_name("foo");
@@ -62,6 +64,7 @@ class BillWriteModelTest {
         assertThat(account.getId_account()).isEqualTo(1);
         assertThat(shop.getId_shop()).isEqualTo(1);
         assertThat(category.getId_category()).isEqualTo(1);
+        assertThat(bill.getId_bill()).isEqualTo(1);
 
         when(categoryRepo.existsById(1)).thenReturn(true);
         when(accountRepo.existsById(1)).thenReturn(true);
@@ -70,8 +73,7 @@ class BillWriteModelTest {
         when(categoryRepo.findById(1)).thenReturn(Optional.of(category));
         when(shopRepo.findById(1)).thenReturn(Optional.of(shop));
         when(productRepo.save(product)).thenReturn(product);
-        when(billRepo.save(bill)).thenReturn(bill);
-        //when(bill.getProducts()).thenReturn(products);
+
 
 
         BillWriteModel billWriteModel = new BillWriteModel(productRepo,categoryRepo,accountRepo,billRepo,shopRepo);
