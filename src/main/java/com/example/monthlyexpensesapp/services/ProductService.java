@@ -3,6 +3,7 @@ package com.example.monthlyexpensesapp.services;
 import com.example.monthlyexpensesapp.adapter.CategoryRepository;
 import com.example.monthlyexpensesapp.adapter.ProductRepository;
 import com.example.monthlyexpensesapp.adapter.BillRepository;
+import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,20 +24,7 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Product addProduct(Product toCreate ,int id_category) {
-
-        if(!categoryRepository.existsById(id_category)) {
-            return null;
-        }
-        var category = categoryRepository.findById(id_category).get();
-
-        toCreate.setCategory(category);
-        productRepository.save(toCreate);
-        logger.warn("added category to product " + toCreate.getId_product() + " category " + category.getCategory_name());
-        return toCreate;
-
-    }
-    public Product addProduct(Product toCreate,int id_category,  int id_bill) {
+    public Product addProductToExistingBill(Product toCreate,int id_category,  int id_bill) {
 
         if(!billRepository.existsById(id_bill)) {
             logger.warn("bill with given id does not exist");
@@ -49,6 +37,7 @@ public class ProductService {
         var bill = billRepository.findById(id_bill).get();
         var category = categoryRepository.findById(id_category).get();
         toCreate.setCategory(category);
+        toCreate.setBill(bill);
         productRepository.save(toCreate);
         return toCreate;
 

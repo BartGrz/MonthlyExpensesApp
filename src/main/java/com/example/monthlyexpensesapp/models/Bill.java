@@ -1,5 +1,6 @@
 package com.example.monthlyexpensesapp.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "bill")
+@JsonIgnoreProperties(value = {"products"} )
 public class Bill {
 
 
@@ -33,7 +35,7 @@ public class Bill {
     @Getter
     @Setter
     private Account account;
-    @OneToMany(mappedBy = "bill")
+    @OneToMany(mappedBy = "bill",fetch = FetchType.LAZY)
     @Getter
     @Setter
     private Set<Product> products;

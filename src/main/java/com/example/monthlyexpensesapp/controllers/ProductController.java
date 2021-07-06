@@ -1,9 +1,7 @@
 package com.example.monthlyexpensesapp.controllers;
 
-import com.example.monthlyexpensesapp.adapter.BillRepository;
-import com.example.monthlyexpensesapp.adapter.CategoryRepository;
-import com.example.monthlyexpensesapp.adapter.ProductRepository;
-import com.example.monthlyexpensesapp.models.Category;
+import com.example.monthlyexpensesapp.adapter.*;
+import com.example.monthlyexpensesapp.logic.BillWriteModel;
 import com.example.monthlyexpensesapp.models.Product;
 import com.example.monthlyexpensesapp.services.ProductService;
 import org.slf4j.Logger;
@@ -12,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -21,13 +20,17 @@ public class ProductController {
     private ProductRepository productRepository;
     private BillRepository billRepository;
     private CategoryRepository categoryRepository;
+    private ShopRepository shopRepository;
+    private AccountRepository accountRepository;
 
     public ProductController(ProductRepository productRepository,
-                             BillRepository billRepository, CategoryRepository categoryRepository
-    ) {
+                             BillRepository billRepository, CategoryRepository categoryRepository,
+                             ShopRepository shopRepository, AccountRepository accountRepository) {
         this.productRepository = productRepository;
         this.billRepository = billRepository;
         this.categoryRepository = categoryRepository;
+        this.shopRepository = shopRepository;
+        this.accountRepository = accountRepository;
     }
 
     @GetMapping
@@ -50,12 +53,16 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @PostMapping("/{id_category}")
-    ResponseEntity<Product> createProduct(@RequestBody Product toCreate, @PathVariable("id_category")int id_category) {
-        ProductService productService = new ProductService(productRepository,billRepository,categoryRepository);
+    @PostMapping("/")
+    ResponseEntity<Product> createProduct(@RequestBody Product toCreate,@RequestParam int id_category, @RequestParam int id_shop, @RequestParam int id_account) {
 
-        var product = productService.addProduct(toCreate,id_category);
 
+        BillWriteModel billWriteModel = new BillWriteModel(productRepository,categoryRepository,accountRepository,billRepository,shopRepository);
+
+        var product = billWriteModel.addProductAndCreateBill(toCreate,id_category,id_shop,id_account, LocalDate.of(2021,7,7));
+        if(product==null) {
+            return ResponseEntity.badRequest().build();
+        }
 
         return ResponseEntity.created(URI.create("/" + product.getId_product())).body(toCreate);
     }

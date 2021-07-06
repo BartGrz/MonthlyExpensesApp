@@ -30,7 +30,9 @@ class BillServiceTest {
         var accountRepo = mock(AccountRepository.class);
         var bill = new Bill();
         bill.setGroup_date(LocalDate.of(2021,7,5));
-
+        Field getIdField = bill.getClass().getDeclaredField("id_bill");
+        getIdField.setAccessible(true);
+        getIdField.set(bill,1);
         var shop = new Shop();
         shop.setShop_name("foo");
         Field readField = shop.getClass().getDeclaredField("id_shop");
@@ -52,11 +54,13 @@ class BillServiceTest {
         when(shopRepo.findById(1)).thenReturn(Optional.of(shop));
         when(accountRepo.findById(1)).thenReturn(Optional.of(account));
 
+
         //then
         assertThat(shop.getShop_name()).isEqualTo("foo");
         assertThat(account.getAccount_name()).isEqualTo("foobar");
         assertEquals(account.getId_account(),1);
         assertEquals(shop.getId_shop(),1);
+        assertEquals(bill.getId_bill(),1);
 
         //under test
         billService.createBill(bill,1,1);
