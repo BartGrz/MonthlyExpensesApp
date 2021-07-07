@@ -56,6 +56,7 @@ class BillServiceTest {
         when(accountRepo.existsById(1)).thenReturn(true);
         when(shopRepo.findById(1)).thenReturn(Optional.of(shop));
         when(accountRepo.findById(1)).thenReturn(Optional.of(account));
+        when(billRepo.save(bill)).thenReturn(bill);
 
 
         //then
