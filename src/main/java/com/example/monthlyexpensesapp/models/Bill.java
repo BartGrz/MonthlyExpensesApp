@@ -35,7 +35,7 @@ public class Bill {
     @Getter
     @Setter
     private Account account;
-    @OneToMany(mappedBy = "bill",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bill",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @Getter
     @Setter
     private Set<Product> products;

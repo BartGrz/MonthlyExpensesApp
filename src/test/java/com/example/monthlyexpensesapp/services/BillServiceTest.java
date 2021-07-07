@@ -2,20 +2,22 @@ package com.example.monthlyexpensesapp.services;
 
 import com.example.monthlyexpensesapp.adapter.AccountRepository;
 import com.example.monthlyexpensesapp.adapter.BillRepository;
+import com.example.monthlyexpensesapp.adapter.ProductRepository;
 import com.example.monthlyexpensesapp.adapter.ShopRepository;
 import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.models.Bill;
+import com.example.monthlyexpensesapp.models.Product;
 import com.example.monthlyexpensesapp.models.Shop;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +30,7 @@ class BillServiceTest {
         var shopRepo = mock(ShopRepository.class);
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
+        var productRepository = mock(ProductRepository.class);
         var bill = new Bill();
         bill.setGroup_date(LocalDate.of(2021,7,5));
         Field getIdField = bill.getClass().getDeclaredField("id_bill");
@@ -45,10 +48,10 @@ class BillServiceTest {
         readField_account.setAccessible(true);
         readField_account.set(account,1);
 
-        var billService = new BillService(billRepo,shopRepo,accountRepo);
+        var billService = new BillService(billRepo,shopRepo,accountRepo, productRepository);
 
         //when
-        when(billRepo.existsById(1)).thenReturn(true);
+        when(billRepo.existsById(1)).thenReturn(false);
         when(shopRepo.existsById(1)).thenReturn(true);
         when(accountRepo.existsById(1)).thenReturn(true);
         when(shopRepo.findById(1)).thenReturn(Optional.of(shop));
@@ -63,7 +66,36 @@ class BillServiceTest {
         assertEquals(bill.getId_bill(),1);
 
         //under test
-        billService.createBill(bill,1,1);
+        billService.openbill(bill,1,1);
 
+    }
+    @Test
+    void checkIfDeletingbillIsworking_andDeletingAllProductsAssociated() throws NoSuchFieldException, IllegalAccessException {
+    
+        //given
+        var shopRepo = mock(ShopRepository.class);
+        var billRepo = mock(BillRepository.class);
+        var accountRepo = mock(AccountRepository.class);
+        var productRepository = mock(ProductRepository.class);
+        var bill = new Bill();
+        
+        bill.setGroup_date(LocalDate.of(2021,7,5));
+        Field getIdField = bill.getClass().getDeclaredField("id_bill");
+        getIdField.setAccessible(true);
+        getIdField.set(bill,1);
+        Set<Product> products = new HashSet<>();
+        products.add(new Product());
+        products.add(new Product());
+        products.add(new Product());
+        bill.setProducts(products);
+        
+        assertThat(bill.getId_bill()).isEqualTo(1);
+        assertThat(bill.getProducts()).isEqualTo(products);
+        
+        when(billRepo.existsById(1)).thenReturn(true);
+        when(billRepo.findById(1)).thenReturn(Optional.of(bill));
+        
+        BillService billService = new BillService(billRepo,shopRepo,accountRepo,productRepository);
+        billService.deleteBill(1);
     }
 }
