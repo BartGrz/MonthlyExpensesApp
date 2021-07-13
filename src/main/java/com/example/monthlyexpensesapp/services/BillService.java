@@ -52,7 +52,11 @@ public class BillService {
         }
         var bill = billRepository.findById(id_bill).get();
         int size = bill.getProducts().size();
-        billRepository.delete(bill);
+        bill.getProducts().stream().forEach(product -> {
+            productRepository.deleteById(product.getId_product());
+        });
+        billRepository.deleteById(bill.getId_bill());
+
         logger.info("Bill removed with " +size + " products "  );
         return bill;
     }

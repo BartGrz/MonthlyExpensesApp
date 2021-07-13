@@ -67,7 +67,7 @@ class BillWriteModelTest {
         assertThat(bill.getId_bill()).isEqualTo(1);
 
         when(categoryRepo.existsById(1)).thenReturn(true);
-        when(accountRepo.existsById(1)).thenReturn(true);
+        when(accountRepo.existsById(1)).thenReturn(false);
         when(shopRepo.existsById(1)).thenReturn(true);
         when(accountRepo.findById(1)).thenReturn(Optional.of(account));
         when(categoryRepo.findById(1)).thenReturn(Optional.of(category));

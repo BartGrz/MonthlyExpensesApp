@@ -24,13 +24,13 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Product addProductToExistingBill(Product toCreate,int id_category,  int id_bill) {
+    public Product addProductToExistingBill(Product toCreate, int id_category, int id_bill) {
 
-        if(!billRepository.existsById(id_bill)) {
+        if (!billRepository.existsById(id_bill)) {
             logger.warn("bill with given id does not exist");
             return null;
         }
-        if(!categoryRepository.existsById(id_category)) {
+        if (!categoryRepository.existsById(id_category)) {
             logger.warn("category with given id does not exist");
             return null;
         }
@@ -43,4 +43,17 @@ public class ProductService {
 
     }
 
+    public Product deleteProduct(int id) {
+        if(!productRepository.existsById(id)) {
+            logger.warn("Product with given id" + id+" not found");
+            return null;
+        }
+        var product = productRepository.findById(id).get();
+        System.out.println(product.getId_product() + " " + product.getProduct_name());
+        productRepository.deleteById(product.getId_product());
+        product.getBill().getProducts().remove(product);
+        logger.warn("Product with given id =" + id+" was deleted from bill with id =" + product.getBill().getId_bill());
+
+        return product;
+    }
 }

@@ -3,14 +3,11 @@ package com.example.monthlyexpensesapp.logic;
 import com.example.monthlyexpensesapp.adapter.*;
 import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
-import com.example.monthlyexpensesapp.services.BillService;
-import com.example.monthlyexpensesapp.services.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
-import java.util.HashSet;
+
 
 @Component
 public class BillWriteModel {
