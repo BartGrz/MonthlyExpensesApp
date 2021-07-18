@@ -89,14 +89,70 @@ class BillServiceTest {
         products.add(new Product());
         products.add(new Product());
         bill.setProducts(products);
-        
+        //then
         assertThat(bill.getId_bill()).isEqualTo(1);
         assertThat(bill.getProducts()).isEqualTo(products);
-        
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
-        
+        //under test
         BillService billService = new BillService(billRepo,shopRepo,accountRepo,productRepository);
         billService.deleteBill(1);
     }
+
+    @Test
+    void checkIfSumWholeBill_isWorking() throws IllegalAccessException, NoSuchFieldException {
+        //given
+        var shopRepo = mock(ShopRepository.class);
+        var billRepo = mock(BillRepository.class);
+        var accountRepo = mock(AccountRepository.class);
+        var productRepository = mock(ProductRepository.class);
+        var bill = new Bill();
+        Field getIdField = bill.getClass().getDeclaredField("id_bill");
+        getIdField.setAccessible(true);
+        getIdField.set(bill,1);
+        Set<Product> products = new HashSet<>();
+        products.add(new Product());
+        products.add(new Product());
+        products.add(new Product());
+        products.stream().forEach(product -> product.setProduct_price(20.0));
+        bill.setProducts(products);
+
+        //then
+        assertThat(bill.getId_bill()).isEqualTo(1);
+        assertThat(bill.getProducts()).isEqualTo(products);
+        when(billRepo.existsById(1)).thenReturn(true);
+        when(billRepo.findById(1)).thenReturn(Optional.of(bill));
+
+        BillService billService = new BillService(billRepo,shopRepo,accountRepo,productRepository);
+        billService.sumWholeBill(1);
+    }
+    @Test
+    void returningAllProductsLinkedWithBill() throws NoSuchFieldException, IllegalAccessException {
+        //given
+        var shopRepo = mock(ShopRepository.class);
+        var billRepo = mock(BillRepository.class);
+        var accountRepo = mock(AccountRepository.class);
+        var productRepository = mock(ProductRepository.class);
+        Bill bill = new Bill();
+        Field getIdField = bill.getClass().getDeclaredField("id_bill");
+        getIdField.setAccessible(true);
+        getIdField.set(bill,1);
+        Set<Product> products = new HashSet<>();
+        products.add(new Product());
+        products.add(new Product());
+        products.add(new Product());
+        products.stream().forEach(product -> product.setProduct_price(20.0));
+        bill.setProducts(products);
+        //then
+        assertThat(bill.getId_bill()).isEqualTo(1);
+        assertThat(bill.getProducts()).isEqualTo(products);
+        when(billRepo.existsById(1)).thenReturn(true);
+        when(billRepo.findById(1)).thenReturn(Optional.of(bill));
+
+        //test
+        BillService billService = new BillService(billRepo,shopRepo,accountRepo,productRepository);
+        billService.getAllProducts(1);
+
+    }
+
 }
