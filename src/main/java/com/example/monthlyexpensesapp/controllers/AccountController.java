@@ -54,6 +54,12 @@ public class AccountController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * block possibility of deleting account if it is linked with any bills (which may indicate owning other account money)
+     *
+     * @param id
+     * @return
+     */
     @DeleteMapping("/account/{id}")
     ResponseEntity<Account> deleteAccount (@PathVariable int id) {
 

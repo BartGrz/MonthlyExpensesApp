@@ -40,6 +40,4 @@ public class Bill {
     @Setter
     private Set<Product> products;
 
-
-
 }

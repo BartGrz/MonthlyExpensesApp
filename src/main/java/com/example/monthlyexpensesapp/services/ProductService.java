@@ -49,7 +49,6 @@ public class ProductService {
             return null;
         }
         var product = productRepository.findById(id).get();
-        System.out.println(product.getId_product() + " " + product.getProduct_name());
         productRepository.deleteById(product.getId_product());
         product.getBill().getProducts().remove(product);
         logger.warn("Product with given id =" + id+" was deleted from bill with id =" + product.getBill().getId_bill());
