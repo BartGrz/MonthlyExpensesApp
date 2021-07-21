@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -94,4 +95,20 @@ public class BillService {
 
         return billRepository.findAll();
     }
-}
+    public void updateProduct(int id_bill, Product toUpdate) {
+    
+        if (!billRepository.existsById(id_bill)) {
+            throw new IllegalStateException("there is no bill with given id");
+        }
+        if(!productRepository.existsById(toUpdate.getId_product())) {
+            throw new IllegalStateException("product with  given id="+toUpdate.getId_product()+" does not exist ");
+        }
+        var bill = billRepository.findById(id_bill).get();
+        var product = bill.getProducts().stream().filter(prod -> prod.getId_product()==toUpdate.getId_product()).findAny().get();
+        
+            product.updateFrom(toUpdate);
+            productRepository.save(product);
+            logger.info("success ! product with id ="+product.getId_product()+ " from bill with id="+id_bill+" changed ");
+        }
+    }
+
