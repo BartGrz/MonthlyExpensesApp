@@ -161,6 +161,7 @@ class BillServiceTest {
     
     @Test
     void checkIfupdatingProductFromBill_throwIllegalStateException_whenWrongBillId() throws NoSuchFieldException, IllegalAccessException {
+        
         //given
         var shopRepo = mock(ShopRepository.class);
         var billRepo = mock(BillRepository.class);
@@ -178,7 +179,6 @@ class BillServiceTest {
         products.add(product);
         bill.setProducts(products);
         
-        
         //then
         assertThat(bill.getId_bill()).isEqualTo(1);
         assertThat(bill.getProducts()).isEqualTo(products);
@@ -189,14 +189,18 @@ class BillServiceTest {
         when(productRepository.existsById(1)).thenReturn(true);
         when(productRepository.findById(1)).thenReturn(Optional.of(product));
         
-        //udenr test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
-        Exception exception = assertThrows(IllegalStateException.class,
-                () -> billService.updateProduct(2, product)); ;
-        String message = exception.getMessage();
-        assertThat(message).isEqualTo(exception.getMessage());
         
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        Exception exceptionBillWrongId = assertThrows(IllegalStateException.class,
+                () -> billService.updateProduct(2, product));
+        Exception exceptionProductDoesNotExist = assertThrows(IllegalStateException.class,
+                () -> billService.updateProduct(1, new Product()));
+        String message_bill = exceptionBillWrongId.getMessage();
+        String message_product = exceptionProductDoesNotExist.getMessage();
+        //under test
+        assertThat(message_bill).isEqualTo(exceptionBillWrongId.getMessage());
+        assertThat(message_product).isEqualTo(exceptionProductDoesNotExist.getMessage());
+        assertDoesNotThrow(() -> billService.updateProduct(1,product));
         
     }
-    
 }

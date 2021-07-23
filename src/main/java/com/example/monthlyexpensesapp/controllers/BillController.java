@@ -52,6 +52,15 @@ public class BillController {
         return ResponseEntity.created(URI.create("/" + bill.getId_bill())).body(toCreate);
 
     }
+    @PutMapping("/{id}")
+    ResponseEntity<Product> updateProductFromBill(@RequestBody Product product , @PathVariable int id) {
+     
+       var updated =  billService.updateProduct(id,product);
+        if(updated==null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(updated);
+    }
 
     @DeleteMapping("/{id}")
     ResponseEntity<Bill> deleteBill(@PathVariable("id") int id_bill) {

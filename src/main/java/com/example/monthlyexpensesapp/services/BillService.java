@@ -56,8 +56,7 @@ public class BillService {
     public Bill deleteBill(int id_bill) {
 
         if (!billRepository.existsById(id_bill)) {
-            logger.warn("Bill with given id" + id_bill + " not found");
-            return null;
+            throw new IllegalStateException("Bill with given id" + id_bill + " not found");
         }
         var bill = billRepository.findById(id_bill).get();
         int size = bill.getProducts().size();
@@ -73,7 +72,7 @@ public class BillService {
     public void sumWholeBill(int id_bill) {
 
         if (!billRepository.existsById(id_bill)) {
-            logger.warn("Bill with given id :" + id_bill + " does not exist");
+            throw new IllegalStateException("Bill with given id :" + id_bill + " does not exist");
         } else {
             var bill = billRepository.findById(id_bill).get();
             double res = bill.getProducts().stream().mapToDouble(value -> value.getProduct_price()).sum();
@@ -95,7 +94,7 @@ public class BillService {
 
         return billRepository.findAll();
     }
-    public void updateProduct(int id_bill, Product toUpdate) {
+    public Product updateProduct(int id_bill, Product toUpdate) {
     
         if (!billRepository.existsById(id_bill)) {
             throw new IllegalStateException("there is no bill with given id");
@@ -107,8 +106,9 @@ public class BillService {
         var product = bill.getProducts().stream().filter(prod -> prod.getId_product()==toUpdate.getId_product()).findAny().get();
         
             product.updateFrom(toUpdate);
-            productRepository.save(product);
+            var updated = productRepository.save(product);
             logger.info("success ! product with id ="+product.getId_product()+ " from bill with id="+id_bill+" changed ");
+            return updated;
         }
     }
 
