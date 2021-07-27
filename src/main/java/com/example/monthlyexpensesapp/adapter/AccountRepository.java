@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+
 public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     List<Account> findAll();
@@ -15,4 +15,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     Account save(Account entity);
     void delete(Account account);
     boolean existsById(Integer id);
+
+
 }

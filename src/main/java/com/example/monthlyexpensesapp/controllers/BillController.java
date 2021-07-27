@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bills")
-@Transactional
 public class BillController {
 
     private BillService billService;
@@ -53,6 +52,16 @@ public class BillController {
 
     }
 
+    @PutMapping("/{id}")
+    ResponseEntity<Product> updateProductFromBill(@RequestBody Product product, @PathVariable int id) {
+
+        var updated = billService.updateProduct(id, product);
+        if (updated == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(updated);
+    }
+
     @DeleteMapping("/{id}")
     ResponseEntity<Bill> deleteBill(@PathVariable("id") int id_bill) {
 
@@ -63,4 +72,23 @@ public class BillController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
+    @PatchMapping("/{id}")
+    @Transactional
+    ResponseEntity<?> toogleBill(@PathVariable("id") int id) {
+        billService.toogleBill(id);
+        return ResponseEntity.noContent().build();
+
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    ResponseEntity<String> handleIllegalState(IllegalStateException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
 }

@@ -5,7 +5,7 @@ spring:
     enabled: true
     path: '/console'
   datasource :
-    url: 'jdbc:h2:file:~/IdeaProjects\MonthlyExpensesApp/monthlyExpenses.db'
+    url: 'jdbc:h2:file:~/deaProjects\MonthlyExpensesApp\monthlyExpenses.db'
   jpa:
     open-in-view: false
     hibernate:

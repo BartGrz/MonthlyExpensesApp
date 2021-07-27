@@ -8,6 +8,7 @@ import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
 import com.example.monthlyexpensesapp.models.Shop;
+import jdk.jfr.Description;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -16,7 +17,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,23 +33,23 @@ class BillServiceTest {
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
         var bill = new Bill();
-        bill.setGroup_date(LocalDate.of(2021,7,5));
+        bill.setGroup_date(LocalDate.of(2021, 7, 5));
         Field getIdField = bill.getClass().getDeclaredField("id_bill");
         getIdField.setAccessible(true);
-        getIdField.set(bill,1);
+        getIdField.set(bill, 1);
         var shop = new Shop();
         shop.setShop_name("foo");
         Field readField = shop.getClass().getDeclaredField("id_shop");
         readField.setAccessible(true);
-        readField.set(shop,1);
+        readField.set(shop, 1);
 
         var account = new Account();
         account.setAccount_name("foobar");
         Field readField_account = account.getClass().getDeclaredField("id_account");
         readField_account.setAccessible(true);
-        readField_account.set(account,1);
+        readField_account.set(account, 1);
 
-        var billService = new BillService(billRepo,shopRepo,accountRepo, productRepository);
+        var billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
 
         //when
         when(billRepo.existsById(1)).thenReturn(false);
@@ -62,28 +63,29 @@ class BillServiceTest {
         //then
         assertThat(shop.getShop_name()).isEqualTo("foo");
         assertThat(account.getAccount_name()).isEqualTo("foobar");
-        assertEquals(account.getId_account(),1);
-        assertEquals(shop.getId_shop(),1);
-        assertEquals(bill.getId_bill(),1);
+        assertEquals(account.getId_account(), 1);
+        assertEquals(shop.getId_shop(), 1);
+        assertEquals(bill.getId_bill(), 1);
 
         //under test
-        billService.openbill(bill,1,1);
+        billService.openbill(bill, 1, 1);
 
     }
+
     @Test
     void checkIfDeletingbillIsworking_andDeletingAllProductsAssociated() throws NoSuchFieldException, IllegalAccessException {
-    
+
         //given
         var shopRepo = mock(ShopRepository.class);
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
         var bill = new Bill();
-        
-        bill.setGroup_date(LocalDate.of(2021,7,5));
+
+        bill.setGroup_date(LocalDate.of(2021, 7, 5));
         Field getIdField = bill.getClass().getDeclaredField("id_bill");
         getIdField.setAccessible(true);
-        getIdField.set(bill,1);
+        getIdField.set(bill, 1);
         Set<Product> products = new HashSet<>();
         products.add(new Product());
         products.add(new Product());
@@ -95,7 +97,7 @@ class BillServiceTest {
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
         //under test
-        BillService billService = new BillService(billRepo,shopRepo,accountRepo,productRepository);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
         billService.deleteBill(1);
     }
 
@@ -109,7 +111,7 @@ class BillServiceTest {
         var bill = new Bill();
         Field getIdField = bill.getClass().getDeclaredField("id_bill");
         getIdField.setAccessible(true);
-        getIdField.set(bill,1);
+        getIdField.set(bill, 1);
         Set<Product> products = new HashSet<>();
         products.add(new Product());
         products.add(new Product());
@@ -123,9 +125,10 @@ class BillServiceTest {
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
 
-        BillService billService = new BillService(billRepo,shopRepo,accountRepo,productRepository);
-        billService.sumWholeBill(1);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        billService.sumWholeBill(bill);
     }
+
     @Test
     void returningAllProductsLinkedWithBill() throws NoSuchFieldException, IllegalAccessException {
         //given
@@ -136,7 +139,7 @@ class BillServiceTest {
         Bill bill = new Bill();
         Field getIdField = bill.getClass().getDeclaredField("id_bill");
         getIdField.setAccessible(true);
-        getIdField.set(bill,1);
+        getIdField.set(bill, 1);
         Set<Product> products = new HashSet<>();
         products.add(new Product());
         products.add(new Product());
@@ -150,9 +153,115 @@ class BillServiceTest {
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
 
         //test
-        BillService billService = new BillService(billRepo,shopRepo,accountRepo,productRepository);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
         billService.getAllProducts(1);
 
     }
 
+    @Test
+    void checkIfupdatingProductFromBill_throwIllegalStateException_whenWrongBillId() throws NoSuchFieldException, IllegalAccessException {
+
+        //given
+        var shopRepo = mock(ShopRepository.class);
+        var billRepo = mock(BillRepository.class);
+        var accountRepo = mock(AccountRepository.class);
+        var productRepository = mock(ProductRepository.class);
+        var product = new Product();
+        Field getProductId = product.getClass().getDeclaredField("id_product");
+        getProductId.setAccessible(true);
+        getProductId.set(product, 1);
+        Bill bill = new Bill();
+        Field getIdField = bill.getClass().getDeclaredField("id_bill");
+        getIdField.setAccessible(true);
+        getIdField.set(bill, 1);
+        Set<Product> products = new HashSet<>();
+        products.add(product);
+        bill.setProducts(products);
+
+        //then
+        assertThat(bill.getId_bill()).isEqualTo(1);
+        assertThat(bill.getProducts()).isEqualTo(products);
+        assertThat(product.getId_product()).isEqualTo(1);
+        when(billRepo.existsById(1)).thenReturn(true);
+        assertThat(product).isEqualTo(product);
+        when(billRepo.findById(1)).thenReturn(Optional.of(bill));
+        when(productRepository.existsById(1)).thenReturn(true);
+        when(productRepository.findById(1)).thenReturn(Optional.of(product));
+
+
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        Exception exceptionBillWrongId = assertThrows(IllegalStateException.class,
+                () -> billService.updateProduct(2, product));
+        Exception exceptionProductDoesNotExist = assertThrows(IllegalStateException.class,
+                () -> billService.updateProduct(1, new Product()));
+        String message_bill = exceptionBillWrongId.getMessage();
+        String message_product = exceptionProductDoesNotExist.getMessage();
+        //under test
+        assertThat(message_bill).isEqualTo(exceptionBillWrongId.getMessage());
+        assertThat(message_product).isEqualTo(exceptionProductDoesNotExist.getMessage());
+        assertDoesNotThrow(() -> billService.updateProduct(1, product));
+
+    }
+
+    @Test
+    void checkIfToogleBillMethod_throwIllegalArgumentException_ifWrongBillIdIsPassed() throws NoSuchFieldException, IllegalAccessException {
+        var shopRepo = mock(ShopRepository.class);
+        var billRepo = mock(BillRepository.class);
+        var accountRepo = mock(AccountRepository.class);
+        var productRepository = mock(ProductRepository.class);
+        var product = new Product();
+        Field getProductId = product.getClass().getDeclaredField("id_product");
+        getProductId.setAccessible(true);
+        getProductId.set(product, 1);
+        Bill bill = new Bill();
+        Field getIdField = bill.getClass().getDeclaredField("id_bill");
+        getIdField.setAccessible(true);
+        getIdField.set(bill, 1);
+        Set<Product> products = new HashSet<>();
+        products.add(product);
+        bill.setProducts(products);
+
+        assertThat(bill.getId_bill()).isEqualTo(1);
+        assertThat(bill.getProducts()).isEqualTo(products);
+        when(billRepo.existsById(1)).thenReturn(false);
+
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        Exception exceptionWrongId = assertThrows(IllegalArgumentException.class, () -> billService.toogleBill(1));
+        String message = exceptionWrongId.getMessage();
+        assertThat(message).isEqualTo(exceptionWrongId.getMessage());
+    }
+    @Test
+    void checkIfToogleBillMethod_doesNotThrowIllegalArgumentException_ifIdExist() throws NoSuchFieldException, IllegalAccessException {
+        var shopRepo = mock(ShopRepository.class);
+        var billRepo = mock(BillRepository.class);
+        var accountRepo = mock(AccountRepository.class);
+        var productRepository = mock(ProductRepository.class);
+        var product = new Product();
+        Field getProductId = product.getClass().getDeclaredField("id_product");
+        getProductId.setAccessible(true);
+        getProductId.set(product, 1);
+        Bill bill = new Bill();
+        Field getIdField = bill.getClass().getDeclaredField("id_bill");
+        getIdField.setAccessible(true);
+        getIdField.set(bill, 1);
+        Set<Product> products = new HashSet<>();
+        products.add(product);
+        bill.setProducts(products);
+
+        assertThat(bill.getId_bill()).isEqualTo(1);
+        assertThat(bill.getProducts()).isEqualTo(products);
+        when(billRepo.existsById(1)).thenReturn(true);
+        when(billRepo.findById(1)).thenReturn(Optional.of(bill));
+
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        assertDoesNotThrow(() -> billService.toogleBill(1));
+    }
+
+    @Test
+    void shortTestBillConbstructor() {
+        Bill bill = new Bill();
+        if (!bill.is_closed()) {
+            System.out.println("test completed " + bill.is_closed());
+        }
+    }
 }

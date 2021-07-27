@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+
 public interface BillRepository extends  JpaRepository<Bill, Integer> {
 
 
@@ -28,4 +28,17 @@ public interface BillRepository extends  JpaRepository<Bill, Integer> {
     @Transactional
     @Query(value = "delete from Bill b where b.id_bill=:id")
     void deleteById (@Param("id") Integer id);
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "Update BILL_SUM set SUM=:sum where ID_BILL=:id")
+    void sumAllAmongBill(@Param("sum") double sum, @Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from BillSum where bill.id_bill=:id")
+    void deleteFromBillSumBillById (@Param("id")int id);
+    @Transactional
+    @Modifying
+    @Query( nativeQuery = true, value = "insert into BILL_SUM (ID_BILL, SUM) VALUES (:id_bill, :sum );")
+    void saveBilltoBillSum(@Param("id_bill") int id_bill, @Param("sum") double sum);
 }

@@ -30,6 +30,9 @@ public class Bill {
     @Getter
     @Setter
     private LocalDate group_date;
+    @Getter
+    @Setter
+    private boolean is_closed;
     @ManyToOne
     @JoinColumn(name = "id_account")
     @Getter
@@ -40,6 +43,15 @@ public class Bill {
     @Setter
     private Set<Product> products;
 
+    public Bill() {
+        this.is_closed=false;
+    }
 
-
+    public void updateFrom( Bill source) {
+       shop=source.shop;
+       group_date=source.group_date;
+       is_closed =source.is_closed;
+       account=source.account;
+       products=source.products;
+    }
 }

@@ -1,0 +1,1 @@
+alter table BILL add is_closed boolean;

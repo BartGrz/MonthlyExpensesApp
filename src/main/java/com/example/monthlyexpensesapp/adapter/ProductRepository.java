@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+
 public interface ProductRepository extends JpaRepository<Product,Integer> {
 
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,7 @@ public class BillService {
         bill.setAccount(account);
         bill.setShop(shop);
         var created = billRepository.save(bill);
+        billRepository.saveBilltoBillSum(created.getId_bill(), 0);
         logger.info("bill created with id = " + created.getId_bill() + " with shop " + shop.getShop_name() + " account " + account.getAccount_name());
         return bill;
     }
@@ -55,34 +57,31 @@ public class BillService {
     public Bill deleteBill(int id_bill) {
 
         if (!billRepository.existsById(id_bill)) {
-            logger.warn("Bill with given id" + id_bill + " not found");
-            return null;
+            throw new IllegalStateException("Bill with given id" + id_bill + " not found");
         }
         var bill = billRepository.findById(id_bill).get();
         int size = bill.getProducts().size();
         bill.getProducts().stream().forEach(product -> {
             productRepository.deleteById(product.getId_product());
         });
+        billRepository.deleteFromBillSumBillById(id_bill);
         billRepository.deleteById(bill.getId_bill());
 
         logger.info("Bill removed with " + size + " products ");
         return bill;
     }
 
-    public void sumWholeBill(int id_bill) {
+    public void sumWholeBill(Bill bill) {
 
-        if (!billRepository.existsById(id_bill)) {
-            logger.warn("Bill with given id :" + id_bill + " does not exist");
-        } else {
-            var bill = billRepository.findById(id_bill).get();
-            double res = bill.getProducts().stream().mapToDouble(value -> value.getProduct_price()).sum();
-            billRepository.sumAllAmongBill(res, id_bill);
-            logger.info("sum for bill id = " + id_bill + " updated");
-        }
+        double res = bill.getProducts().stream().mapToDouble(value -> value.getProduct_price()).sum();
+        billRepository.sumAllAmongBill(res, bill.getId_bill());
+        logger.info("sum for bill id = " + bill.getId_bill() + " updated");
+
     }
+
     public List<Product> getAllProducts(int id_bill) {
 
-        if(!billRepository.existsById(id_bill)) {
+        if (!billRepository.existsById(id_bill)) {
             return Collections.emptyList();
         }
         var bill = billRepository.findById(id_bill).get();
@@ -90,8 +89,42 @@ public class BillService {
 
         return bill.getProducts().stream().collect(Collectors.toList());
     }
+
     public List<Bill> getAllBills() {
 
         return billRepository.findAll();
     }
+
+    public Product updateProduct(int id_bill, Product toUpdate) {
+
+        if (!billRepository.existsById(id_bill)) {
+            throw new IllegalStateException("there is no bill with given id");
+        }
+        if (!productRepository.existsById(toUpdate.getId_product())) {
+            throw new IllegalStateException("product with  given id=" + toUpdate.getId_product() + " does not exist ");
+        }
+        var bill = billRepository.findById(id_bill).get();
+        var product = bill.getProducts().stream().filter(prod -> prod.getId_product() == toUpdate.getId_product()).findAny().get();
+
+        product.updateFrom(toUpdate);
+        var updated = productRepository.save(product);
+        logger.info("success ! product with id =" + product.getId_product() + " from bill with id=" + id_bill + " changed ");
+        return updated;
+    }
+
+    public void toogleBill(int id_bill) {
+
+        if (!billRepository.existsById(id_bill)) {
+            throw new IllegalArgumentException("there is no bill with given id");
+        }
+        var bill = billRepository.findById(id_bill).get();
+        bill.set_closed(true);
+        billRepository.save(bill);
+        logger.info("Bill is closed successfully, sum will be calculated");
+        if (bill.is_closed()) {
+            sumWholeBill(bill);
+        }
+
+    }
 }
+
