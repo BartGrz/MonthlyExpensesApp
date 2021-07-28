@@ -28,6 +28,11 @@ class BillWriteModelTest {
         var accountRepo = mock(AccountRepository.class);
         var shopRepo = mock(ShopRepository.class);
         Set<Product> products = new HashSet<>();
+        var account = new Account();
+        account.setAccount_name("foobar");
+        Field readField_account = account.getClass().getDeclaredField("id_account");
+        readField_account.setAccessible(true);
+        readField_account.set(account,1);
 
         var product = new Product();
         Field getProductId = product.getClass().getDeclaredField("id_product");
@@ -35,7 +40,7 @@ class BillWriteModelTest {
         getProductId.set(product,1);
         product.setProduct_name("foo");
         product.setProduct_price(25.0);
-        product.setProduct_common(true);
+        product.setAccount(account);
         product.setProduct_note("foo");
 
         var bill = new Bill();
@@ -48,12 +53,6 @@ class BillWriteModelTest {
         Field readField = shop.getClass().getDeclaredField("id_shop");
         readField.setAccessible(true);
         readField.set(shop,1);
-
-        var account = new Account();
-        account.setAccount_name("foobar");
-        Field readField_account = account.getClass().getDeclaredField("id_account");
-        readField_account.setAccessible(true);
-        readField_account.set(account,1);
 
         var category = new Category();
         Field getCategoryId = category.getClass().getDeclaredField("id_category");

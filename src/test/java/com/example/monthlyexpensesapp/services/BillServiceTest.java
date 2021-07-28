@@ -9,6 +9,7 @@ import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
 import com.example.monthlyexpensesapp.models.Shop;
 import jdk.jfr.Description;
+import org.hamcrest.core.DescribedAs;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -205,6 +206,7 @@ class BillServiceTest {
 
     @Test
     void checkIfToogleBillMethod_throwIllegalArgumentException_ifWrongBillIdIsPassed() throws NoSuchFieldException, IllegalAccessException {
+        //given
         var shopRepo = mock(ShopRepository.class);
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
@@ -220,18 +222,20 @@ class BillServiceTest {
         Set<Product> products = new HashSet<>();
         products.add(product);
         bill.setProducts(products);
-
+        //then
         assertThat(bill.getId_bill()).isEqualTo(1);
         assertThat(bill.getProducts()).isEqualTo(products);
         when(billRepo.existsById(1)).thenReturn(false);
-
+        //under test
         BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
         Exception exceptionWrongId = assertThrows(IllegalArgumentException.class, () -> billService.toogleBill(1));
         String message = exceptionWrongId.getMessage();
         assertThat(message).isEqualTo(exceptionWrongId.getMessage());
     }
+
     @Test
     void checkIfToogleBillMethod_doesNotThrowIllegalArgumentException_ifIdExist() throws NoSuchFieldException, IllegalAccessException {
+        //given
         var shopRepo = mock(ShopRepository.class);
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
@@ -247,12 +251,12 @@ class BillServiceTest {
         Set<Product> products = new HashSet<>();
         products.add(product);
         bill.setProducts(products);
-
+        //given
         assertThat(bill.getId_bill()).isEqualTo(1);
         assertThat(bill.getProducts()).isEqualTo(products);
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
-
+        //test
         BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
         assertDoesNotThrow(() -> billService.toogleBill(1));
     }
@@ -260,8 +264,7 @@ class BillServiceTest {
     @Test
     void shortTestBillConbstructor() {
         Bill bill = new Bill();
-        if (!bill.is_closed()) {
-            System.out.println("test completed " + bill.is_closed());
-        }
+        assertThat(bill.is_closed()).isEqualTo(false);
+
     }
 }
