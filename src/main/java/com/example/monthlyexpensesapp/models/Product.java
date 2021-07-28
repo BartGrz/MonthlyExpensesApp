@@ -29,9 +29,6 @@ public class Product {
     @Getter
     @Setter
     private String product_note;
-    @Getter
-    @Setter
-    private boolean product_common;
     @ManyToOne
     @JoinColumn(name = "id_category")
     @Getter
@@ -42,15 +39,17 @@ public class Product {
     @Getter
     @Setter
     private Bill bill;
-
+    @ManyToOne
+    @JoinColumn(name = "id_account")
+    @Getter
+    @Setter
+    private Account account;
     public void updateFrom(Product source) {
 
         this.product_name = source.product_name;
         this.product_note = source.product_note;
-        this.product_common = source.product_common;
         this.product_price = source.product_price;
-
-
+        this.account=source.account;
     }
 
 

@@ -89,7 +89,7 @@ public class ProductController {
         return ResponseEntity.created(URI.create("/" + product.getId_product())).body(toCreate);
     }
     
-    @PostMapping("/add_to_bill")
+    @PostMapping("/add-to-bill")
     ResponseEntity<Product> createProductAndAddTobill(@RequestBody Product toCreate, @RequestParam int id_category, @RequestParam int id_bill) {
         
         ProductService productService = new ProductService(productRepository, billRepository, categoryRepository);
