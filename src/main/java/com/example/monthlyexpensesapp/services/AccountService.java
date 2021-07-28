@@ -41,8 +41,6 @@ public class AccountService {
      * it will calculate how many money is owed to the bill payer
      */
 
-    //TODO: product mus be annotated with id_account instead of common row 'true or false'
-    // need to be changed in order to make the logic possible
     public void updateAccount(int id_account) {
 
         if (!accountRepository.existsById(id_account)) {
