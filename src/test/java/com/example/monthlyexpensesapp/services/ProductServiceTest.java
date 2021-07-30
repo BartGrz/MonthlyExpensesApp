@@ -1,5 +1,6 @@
 package com.example.monthlyexpensesapp.services;
 
+import com.example.monthlyexpensesapp.adapter.AccountRepository;
 import com.example.monthlyexpensesapp.adapter.BillRepository;
 import com.example.monthlyexpensesapp.adapter.CategoryRepository;
 import com.example.monthlyexpensesapp.adapter.ProductRepository;
@@ -29,6 +30,7 @@ class ProductServiceTest {
         var billRepo = mock(BillRepository.class);
         var productRepo = mock(ProductRepository.class);
         var categpryRepo = mock(CategoryRepository.class);
+        var accountRepo = mock(AccountRepository.class);
         var product = new Product();
         var bill = new Bill();
         Set<Product> set = new HashSet<>();
@@ -50,7 +52,7 @@ class ProductServiceTest {
         when(productRepo.findById(1)).thenReturn(Optional.of(product));
 
         //system under test
-        ProductService productService = new ProductService(productRepo,billRepo,categpryRepo);
+        ProductService productService = new ProductService(productRepo,billRepo,categpryRepo,accountRepo);
         productService.deleteProduct(1);
 
 

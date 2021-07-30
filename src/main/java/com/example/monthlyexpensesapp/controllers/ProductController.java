@@ -33,94 +33,60 @@ import java.util.List;
 public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-    private ProductRepository productRepository;
-    private BillRepository billRepository;
-    private CategoryRepository categoryRepository;
-    private ShopRepository shopRepository;
-    private AccountRepository accountRepository;
-    private BillService billService;
+    private ProductService productService;
+    private BillWriteModel billWriteModel;
 
-    @Autowired
-    public void setBillService(BillService billService) {
-        this.billService = billService;
+    public ProductController(ProductService productService, BillWriteModel billWriteModel) {
+        this.productService = productService;
+        this.billWriteModel = billWriteModel;
     }
 
-    public ProductController(ProductRepository productRepository,
-                             BillRepository billRepository, CategoryRepository categoryRepository,
-                             ShopRepository shopRepository, AccountRepository accountRepository) {
-        this.productRepository = productRepository;
-        this.billRepository = billRepository;
-        this.categoryRepository = categoryRepository;
-        this.shopRepository = shopRepository;
-        this.accountRepository = accountRepository;
-    }
-    
     @GetMapping
-    ResponseEntity<List<Product>> readAllProducts(Model model)  {
-        var products = productRepository.findAll();
-        
-        if (productRepository.findAll().isEmpty()) {
+    ResponseEntity<List<Product>> readAllProducts() {
+        var products = productService.readAllProducts();
+
+        if (products.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        model.addAttribute("productsPage", products);
-
         return ResponseEntity.ok(products);
     }
-    
+
     @GetMapping("/{id}")
     ResponseEntity<Product> readProductById(@PathVariable int id) {
-        if (!productRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        var product = productRepository.findById(id).get();
+
+        var product = productService.readProductById(id);
         return ResponseEntity.ok(product);
     }
-    
-    @PostMapping("/")
-    ResponseEntity<Product> createProduct
-            (@RequestBody Product toCreate, @RequestParam int id_category, @RequestParam int id_shop, @RequestParam int id_account) {
 
-        BillWriteModel billWriteModel = new BillWriteModel(productRepository, categoryRepository, accountRepository, billRepository, shopRepository);
-        var product = billWriteModel.addProductAndCreateBill(toCreate, id_category, id_shop, id_account, LocalDate.of(2021, 7, 7));
-        if (product == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        return ResponseEntity.created(URI.create("/" + product.getId_product())).body(toCreate);
-    }
-    
     @PostMapping("/add-to-bill")
-    ResponseEntity<Product> createProductAndAddTobill(@RequestBody Product toCreate, @RequestParam int id_category, @RequestParam int id_bill) {
-        
-        ProductService productService = new ProductService(productRepository, billRepository, categoryRepository);
-        
-        var product = productService.addProductToExistingBill(toCreate, id_category, id_bill);
-        if (product == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        
+    ResponseEntity<Product> createProductAndAddTobill(@RequestBody Product toCreate, @RequestParam int id_category, @RequestParam int id_bill, @RequestParam int id_account) {
+
+        var product = productService.addProductToExistingBill(toCreate, id_category, id_bill, id_account);
         return ResponseEntity.created(URI.create("/" + product.getId_product())).body(toCreate);
     }
-    
+
     @PutMapping("/{id}")
     ResponseEntity<Product> updateProduct(@RequestBody Product toCreate, @PathVariable("id") int id_product) {
-        
-        if (!productRepository.existsById(id_product)) {
-            return ResponseEntity.badRequest().build();
-        }
-        var product = productRepository.findById(id_product).get();
+
+        var product = productService.readProductById(id_product);
         product.updateFrom(toCreate);
-        var updated = productRepository.save(product);
-        
+        var updated = productService.updateProduct(product);
         return ResponseEntity.created(URI.create("/" + product.getId_product())).body(updated);
     }
+
     @DeleteMapping("/{id}")
-    ResponseEntity<Product> deleteProduct (@PathVariable("id") int id) {
-    ProductService productService = new ProductService(productRepository,billRepository,categoryRepository);
-    var product = productService.deleteProduct(id);
-    if(product==null) {
-        return ResponseEntity.notFound().build();
+    ResponseEntity<Product> deleteProduct(@PathVariable("id") int id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
-        return ResponseEntity.ok(product);
+
+    @ExceptionHandler(IllegalStateException.class)
+    ResponseEntity<String> handleIllegalState(IllegalStateException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
