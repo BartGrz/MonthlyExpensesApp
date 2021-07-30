@@ -2,6 +2,7 @@ package com.example.monthlyexpensesapp.controllers;
 
 import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.adapter.AccountRepository;
+import com.example.monthlyexpensesapp.services.AccountService;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +48,7 @@ class AccountControllerTest {
 
     private AccountController getAccountController() {
         AccountRepository accountRepository = mock(AccountRepository.class);
-        return new AccountController(accountRepository);
+        AccountService accountService = mock(AccountService.class);
+        return new AccountController(accountRepository, accountService);
     }
 }

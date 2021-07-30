@@ -7,10 +7,7 @@ import com.example.monthlyexpensesapp.models.Product;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,6 +117,77 @@ class AccountServiceTest {
         //udner test
         AccountService service = new AccountService(accountRepo);
         assertDoesNotThrow(() -> service.updateAccount(1));
+
+
+    }
+    @Test
+    void checkIfAutoCalcultaingOfAccountsDebt_working () throws NoSuchFieldException, IllegalAccessException {
+        var accountRepository  = mock(AccountRepository.class);
+        AccountService accountService = new AccountService(accountRepository);
+        Account account_1 = new Account();
+        Account account_2 = new Account();
+        Account account_3 = new Account();
+        Product product_1 = new Product();
+        Product product_2 = new Product();
+        Product product_3 = new Product();
+        Bill bill = new Bill();
+        Set<Product> products = new HashSet<>();
+        List<Account> accountList = new ArrayList<>();
+        Set<Bill> bills = new HashSet<>();
+
+        Field account_id_1 = account_1.getClass().getDeclaredField("id_account");
+        account_id_1.setAccessible(true);
+        account_id_1.set(account_1,1);
+        Field account_id_2 = account_2.getClass().getDeclaredField("id_account");
+        account_id_2.setAccessible(true);
+        account_id_2.set(account_2,2);
+        Field account_id_3 = account_3.getClass().getDeclaredField("id_account");
+        account_id_3.setAccessible(true);
+        account_id_3.set(account_3,3);
+
+        Field product_id = product_1.getClass().getDeclaredField("id_product");
+        product_id.setAccessible(true);
+        product_id.set(product_1,1);
+        product_1.setAccount(account_1);
+
+        Field product_id_2 = product_2.getClass().getDeclaredField("id_product");
+        product_id_2.setAccessible(true);
+        product_id_2.set(product_2,2);
+        product_2.setAccount(account_2);
+
+        Field product_id_3 = product_3.getClass().getDeclaredField("id_product");
+        product_id_3.setAccessible(true);
+        product_id_3.set(product_3,3);
+        product_3.setAccount(account_2);
+
+        products.add(product_1);
+        products.add(product_2);
+        products.add(product_3);
+
+        accountList.add(account_1);
+        accountList.add(account_2);
+        accountList.add(account_3);
+
+
+        final double [] add = {0};
+        products.stream().forEach(product -> {
+            product.setProduct_price(20+ add[0]);
+            add[0]=product.getProduct_price();
+        });
+
+        bill.setProducts(products);
+        bills.add(bill);
+        account_1.setBills(bills);
+        bill.setAccount(account_1);
+
+        when(accountRepository.findAll()).thenReturn(accountList);
+        assertThat(account_1.getBills()).isEqualTo(bills);
+        assertThat(bill.getProducts()).isEqualTo(products);
+        assertThat(bill.getAccount()).isEqualTo(account_1);
+        assertThat(product_1.getAccount()).isEqualTo(account_1);
+        assertThat(product_2.getAccount()).isEqualTo(account_2);
+        assertThat(product_3.getAccount()).isEqualTo(account_2);
+        accountService.updateDebtOfAccounts(bill);
 
 
     }

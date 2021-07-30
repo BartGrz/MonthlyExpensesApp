@@ -28,7 +28,7 @@ public class Account {
     @Getter
     @Setter
     private String account_name;
-    @OneToMany(mappedBy = "account",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "account",fetch = FetchType.EAGER)
     @Setter
     @Getter
     private Set<Bill> bills;

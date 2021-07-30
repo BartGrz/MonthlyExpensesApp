@@ -2,6 +2,7 @@ package com.example.monthlyexpensesapp.controllers;
 
 import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.adapter.AccountRepository;
+import com.example.monthlyexpensesapp.services.AccountService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
@@ -12,9 +13,11 @@ import java.util.List;
 public class AccountController {
 
    private AccountRepository accountRepository;
+   private AccountService accountService;
 
-    public AccountController(AccountRepository accountRepository) {
+    public AccountController(AccountRepository accountRepository, AccountService accountService) {
         this.accountRepository = accountRepository;
+        this.accountService = accountService;
     }
 
     @GetMapping("/account")
@@ -34,7 +37,7 @@ public class AccountController {
     @PostMapping("/account")
     ResponseEntity<Account> createAccount(@RequestBody Account toCreate) {
 
-        Account result = accountRepository.save(toCreate);
+        Account result = accountService.creatingAccount(toCreate);
 
         return ResponseEntity.created(URI.create("/" + result.getId_account())).body(toCreate);
     }

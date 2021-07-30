@@ -33,5 +33,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     @Query(nativeQuery = true, value = "UPDATE ACCOUNT_DEBT set DEBT=:debt where ID_ACCOUNT=:id_account")
     void updateAccountDebt(@Param("debt") double debt, @Param("id_account") int id_account);
 
+    @Query("select ac.debt from AccountDebt ac where ac.id.id_account=:id")
+    double getAccountDebtById(@Param("id") int id);
 
 }

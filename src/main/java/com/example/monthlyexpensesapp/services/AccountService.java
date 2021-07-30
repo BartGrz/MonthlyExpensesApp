@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerMapping;
 
-import java.util.List;
+import javax.transaction.Transactional;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -37,10 +38,9 @@ public class AccountService {
     }
 
     /**
-     * logic : must updating debt based on how many products has false in 'common' row,
-     * it will calculate how many money is owed to the bill payer
+     * updating whole account from the beginning, method more applicable for being a tool
+     * method updateDebtOfAccounts and method summWholeBill from BillService class are better in use
      */
-
     public void updateAccount(int id_account) {
 
         if (!accountRepository.existsById(id_account)) {
@@ -48,31 +48,60 @@ public class AccountService {
         }
         List<Account> accountList = accountRepository.findAll();
         var account = accountRepository.findById(id_account).get();
-        accountList.removeIf(acc -> acc.equals(account));
+        accountList.removeIf(acc -> acc.getId_account() == id_account);
 
-
+        final double[] total_debt = {0};
         accountList.forEach(acc -> acc.getBills().stream()
                 .map(Bill::getProducts)
                 .forEach(products -> {
                     var res = products.stream()
-                            .filter(product -> product.getAccount().equals(acc))
                             .mapToDouble(Product::getProduct_price).sum();
-                    accountRepository.updateAccountDebt(res, id_account);
-                    logger.warn("result = " + res);
-                    logger.info("account debt with id:" + id_account + " has been updated");
-                }));
+                    total_debt[0] = res + total_debt[0];
 
+                }));
+        accountRepository.updateAccountDebt(total_debt[0], id_account);
+        logger.info("account debt with id:" + id_account + " has been updated");
+
+        final double[] total_balance = {0};
         account.getBills().stream()
                 .map(Bill::getProducts)
                 .forEach(products -> {
                     var res = products.stream()
                             .filter(product -> product.getAccount().getId_account() == id_account)
                             .mapToDouble(Product::getProduct_price).sum();
-                    accountRepository.updateAccountDebt(res, id_account);
-                    logger.warn("result = " + res);
-                    logger.info("account balance with id:" + id_account + " has been updated");
+                    total_balance[0] = res + total_balance[0];
                 });
+
+        accountRepository.updateAccountBalance(total_balance[0], id_account);
+        logger.info("account balance with id:" + id_account + " has been updated");
+    }
+
+    /**
+     * based on bill given and list of accounts, method will calculate how much other accounts owe to the account which pay for bill.
+     * @param bill
+     */
+    public void updateDebtOfAccounts(Bill bill) {
+
+        Map<Integer, Set<Product>> productsMap = new HashMap<>();
+        List<Account> accountList = accountRepository.findAll();
+        accountList.removeIf(account -> account.getId_account() == bill.getAccount().getId_account()); //removing account which pay for bill(because it is not needed for operations)
+        /**
+         * filling the map with integer as key and set of products as value
+         */
+        accountList.forEach(account -> {
+          var set =  bill.getProducts().stream().filter(product -> product.getAccount().getId_account()==account.getId_account()).collect(Collectors.toSet());
+          productsMap.put(account.getId_account(),set);
+        });
+        /**
+         * calculating sum of whole set for all accounts in list, then updating row in column debt for each account id in the list
+         */
+        accountList.forEach(account -> {
+          var debt =   productsMap.get(account.getId_account()).stream().mapToDouble(Product::getProduct_price).sum();
+          accountRepository.updateAccountDebt(debt,account.getId_account());
+          logger.warn("debt for id " + account.getId_account() + " == " + debt);
+        });
+
+        }
 
     }
 
-}
