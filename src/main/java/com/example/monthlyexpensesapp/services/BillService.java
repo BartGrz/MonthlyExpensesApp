@@ -5,6 +5,7 @@ import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -28,19 +29,17 @@ public class BillService {
         this.productRepository = productRepository;
     }
 
-    public Bill openbill(Bill bill, int id_account, int id_shop) {
+
+    public Bill openbill(Bill bill, int id_shop, int id_account) {
 
         if (billRepository.existsById(bill.getId_bill())) {
-            logger.warn("Bill already exist");
-            return null;
+            throw new IllegalArgumentException("Bill already exist");
         }
         if (!accountRepository.existsById(id_account)) {
-            logger.warn("account does not exist");
-            return null;
+            throw new IllegalArgumentException("account does not exist");
         }
         if (!shopRepository.existsById(id_shop)) {
-            logger.warn("shop does not exist");
-            return null;
+            throw new IllegalArgumentException("shop does not exist");
         }
         var account = accountRepository.findById(id_account).get();
         var shop = shopRepository.findById(id_shop).get();
@@ -69,11 +68,21 @@ public class BillService {
         return bill;
     }
 
+    /**
+     * summing total cost and updating balance of the account of a bill payer
+     * @param bill
+     */
     public void sumWholeBill(Bill bill) {
 
+        if(bill.getProducts().isEmpty()) {
+            throw new IllegalStateException("Bill does not have products");
+        }
         double res = bill.getProducts().stream().mapToDouble(value -> value.getProduct_price()).sum();
         billRepository.sumAllAmongBill(res, bill.getId_bill());
         logger.info("sum for bill id = " + bill.getId_bill() + " updated");
+        var sum = billRepository.getBillSumById(bill.getId_bill());
+        var balance = sum+ accountRepository.getAccountDebtById(bill.getAccount().getId_account());
+        accountRepository.updateAccountBalance(balance, bill.getAccount().getId_account());
 
     }
 
@@ -91,6 +100,13 @@ public class BillService {
     public List<Bill> getAllBills() {
 
         return billRepository.findAll();
+    }
+
+    public Bill getBill(int id) {
+        if (!billRepository.existsById(id)) {
+            throw new IllegalArgumentException("there is no bill with given id " + id);
+        }
+        return billRepository.findById(id).get();
     }
 
     public Product updateProduct(int id_bill, Product toUpdate) {
@@ -118,11 +134,12 @@ public class BillService {
         var bill = billRepository.findById(id_bill).get();
         bill.set_closed(true);
         billRepository.save(bill);
-        logger.info("Bill is closed successfully, sum will be calculated");
-        if (bill.is_closed()) {
-            sumWholeBill(bill);
-        }
 
+        if (!bill.is_closed()) {
+            throw new IllegalStateException("Bill is already closed");
+        }
+        logger.info("Bill is closed successfully, sum will be calculated");
+        sumWholeBill(bill);
     }
 }
 

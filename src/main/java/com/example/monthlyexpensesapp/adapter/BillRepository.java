@@ -41,4 +41,7 @@ public interface BillRepository extends  JpaRepository<Bill, Integer> {
     @Modifying
     @Query( nativeQuery = true, value = "insert into BILL_SUM (ID_BILL, SUM) VALUES (:id_bill, :sum );")
     void saveBilltoBillSum(@Param("id_bill") int id_bill, @Param("sum") double sum);
+
+    @Query("select bs.sum from BillSum bs where bs.id.id_bill=:id")
+    double getBillSumById(@Param("id") int id);
 }

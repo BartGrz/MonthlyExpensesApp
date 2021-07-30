@@ -1,11 +1,8 @@
 package com.example.monthlyexpensesapp.controllers;
 
-import com.example.monthlyexpensesapp.adapter.AccountRepository;
-import com.example.monthlyexpensesapp.adapter.BillRepository;
-import com.example.monthlyexpensesapp.adapter.ProductRepository;
-import com.example.monthlyexpensesapp.adapter.ShopRepository;
 import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
+import com.example.monthlyexpensesapp.services.AccountService;
 import com.example.monthlyexpensesapp.services.BillService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +16,11 @@ import java.util.List;
 public class BillController {
 
     private BillService billService;
+    private AccountService accountService;
 
-    public BillController(BillService billService) {
+    public BillController(BillService billService, AccountService accountService) {
         this.billService = billService;
+        this.accountService = accountService;
     }
 
     @GetMapping("/")
@@ -73,11 +72,12 @@ public class BillController {
         }
     }
 
-
     @PatchMapping("/{id}")
     @Transactional
     ResponseEntity<?> toogleBill(@PathVariable("id") int id) {
+        var bill = billService.getBill(id);
         billService.toogleBill(id);
+        accountService.updateDebtOfAccounts(bill);
         return ResponseEntity.noContent().build();
 
     }
@@ -86,6 +86,7 @@ public class BillController {
     ResponseEntity<String> handleIllegalState(IllegalStateException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
