@@ -5,6 +5,7 @@ import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
@@ -29,19 +30,25 @@ public class BillWriteModel {
         this.shopRepository = shopRepository;
     }
 
+    /**
+     * creating new bill and adding product passed via POST method into products list. Maybe usefull later
+     * @param toCreate
+     * @param id_category
+     * @param id_shop
+     * @param id_account
+     * @param date
+     * @return
+     */
     public Product addProductAndCreateBill(Product toCreate, int id_category, int id_shop, int id_account, LocalDate date) {
 
         if (!accountRepository.existsById(id_account)) {
-            logger.warn("account does not exist");
-            return null;
+            throw new IllegalArgumentException("account does not exist");
         }
         if (!categoryRepository.existsById(id_category)) {
-            logger.warn("category does not exist");
-            return null;
+            throw new IllegalArgumentException("category does not exist");
         }
         if (!categoryRepository.existsById(id_category)) {
-            logger.warn("category does not exist");
-            return null;
+            throw new IllegalArgumentException("category does not exist");
         }
         var account = accountRepository.findById(id_account).get();
         var category = categoryRepository.findById(id_category).get();
@@ -55,9 +62,7 @@ public class BillWriteModel {
         toCreate.setCategory(category);
         toCreate.setBill(bill);
         var product = productRepository.save(toCreate);
-
         logger.info("product created and added to bill  " + product.getId_product());
-
         return product;
     }
 

@@ -70,19 +70,20 @@ public class BillService {
 
     /**
      * summing total cost and updating balance of the account of a bill payer
+     *
      * @param bill
      */
     public void sumWholeBill(Bill bill) {
 
-        if(bill.getProducts().isEmpty()) {
+        if (bill.getProducts().isEmpty()) {
             throw new IllegalStateException("Bill does not have products");
         }
         double res = bill.getProducts().stream().mapToDouble(value -> value.getProduct_price()).sum();
         billRepository.sumAllAmongBill(res, bill.getId_bill());
         logger.info("sum for bill id = " + bill.getId_bill() + " updated");
         var sum = billRepository.getBillSumById(bill.getId_bill());
-        var balance = sum+ accountRepository.getAccountDebtById(bill.getAccount().getId_account());
-        accountRepository.updateAccountBalance(balance, bill.getAccount().getId_account());
+        // var balance = sum+ accountRepository.getAccountDebtById(bill.getAccount().getId_account());
+        accountRepository.updateAccountBalance(sum, bill.getAccount().getId_account());
 
     }
 
@@ -131,13 +132,15 @@ public class BillService {
         if (!billRepository.existsById(id_bill)) {
             throw new IllegalArgumentException("there is no bill with given id");
         }
-        var bill = billRepository.findById(id_bill).get();
-        bill.set_closed(true);
-        billRepository.save(bill);
 
-        if (!bill.is_closed()) {
+        var bill = billRepository.findById(id_bill).get();
+        if (bill.is_closed()) {
             throw new IllegalStateException("Bill is already closed");
         }
+        bill.set_closed(true);
+        var updated = billRepository.save(bill);
+
+
         logger.info("Bill is closed successfully, sum will be calculated");
         sumWholeBill(bill);
     }
