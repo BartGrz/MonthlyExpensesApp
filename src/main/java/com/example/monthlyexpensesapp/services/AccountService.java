@@ -32,7 +32,6 @@ public class AccountService {
             throw new IllegalStateException("Account already exist");
         }
         var accountCreated = accountRepository.save(account);
-        accountRepository.saveToAccountDebt(accountCreated.getId_account());
         logger.info("Account " + accountCreated.getAccount_name() + " created");
         return accountCreated;
     }
@@ -50,17 +49,14 @@ public class AccountService {
         var account = accountRepository.findById(id_account).get();
         accountList.removeIf(acc -> acc.getId_account() == id_account);
 
-        final double[] total_debt = {0};
         accountList.forEach(acc -> acc.getBills().stream()
                 .map(Bill::getProducts)
                 .forEach(products -> {
                     var res = products.stream()
                             .mapToDouble(Product::getProduct_price).sum();
-                    total_debt[0] = res + total_debt[0];
-
+                    accountRepository.updateAccountDebt(res, acc.getId_account(), id_account);
+                    logger.info("account debt with id:" + id_account + " has been updated");
                 }));
-        accountRepository.updateAccountDebt(total_debt[0], id_account);
-        logger.info("account debt with id:" + id_account + " has been updated");
 
         final double[] total_balance = {0};
         account.getBills().stream()
@@ -76,8 +72,13 @@ public class AccountService {
         logger.info("account balance with id:" + id_account + " has been updated");
     }
 
+    //TODO : must implement method which will check if one account
+    // is already owe money to another account, then update it
+    // , if not it should insert new row into table
+
     /**
      * based on bill given and list of accounts, method will calculate how much other accounts owe to the account which pay for bill.
+     *
      * @param bill
      */
     public void updateDebtOfAccounts(Bill bill) {
@@ -89,19 +90,30 @@ public class AccountService {
          * filling the map with integer as key and set of products as value
          */
         accountList.forEach(account -> {
-          var set =  bill.getProducts().stream().filter(product -> product.getAccount().getId_account()==account.getId_account()).collect(Collectors.toSet());
-          productsMap.put(account.getId_account(),set);
+            var set = bill.getProducts()
+                    .stream()
+                    .filter(product -> product.getAccount().getId_account() == account.getId_account())
+                    .collect(Collectors.toSet());
+            productsMap.put(account.getId_account(), set);
         });
         /**
          * calculating sum of whole set for all accounts in list, then updating row in column debt for each account id in the list
          */
         accountList.forEach(account -> {
-          var debt =   productsMap.get(account.getId_account()).stream().mapToDouble(Product::getProduct_price).sum();
-          accountRepository.updateAccountDebt(debt,account.getId_account());
-          logger.warn("debt for id " + account.getId_account() + " == " + debt);
+            var debt = productsMap.get(account.getId_account())
+                    .stream().mapToDouble(Product::getProduct_price)
+                    .sum();
+            if (!accountRepository.existsById_debtor(account.getId_account(), bill.getAccount().getId_account())) {
+                var total = debt+accountRepository.getAccountDebtById(account.getId_account(),bill.getAccount().getId_account());
+                accountRepository.updateAccountDebt(total, bill.getAccount().getId_account(), account.getId_account());
+                logger.warn("debt for id " + account.getId_account() + " == " + total + " account owe money to " + bill.getAccount().getId_account());
+            } else {
+                accountRepository.saveToAccountDebt(account.getId_account(), bill.getAccount().getId_account(), debt);
+                logger.info("adding new debt , account id =" + account.getId_account() + " owes  " + debt + " to id=" + bill.getAccount().getId_account());
+            }
         });
 
-        }
-
     }
+
+}
 

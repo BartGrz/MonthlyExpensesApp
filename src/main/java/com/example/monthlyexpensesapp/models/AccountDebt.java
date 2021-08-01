@@ -17,15 +17,11 @@ public class AccountDebt {
     @Getter
     @Setter
     private double debt;
-    @Getter
-    @Setter
-    private double balance;
     @OneToOne
-    @JoinColumn(name = "id_account")
+    @JoinColumn(name = "id_account" ,updatable = false, insertable = false)
     @Getter
     @Setter
     private Account account;
-
 
 }
 
@@ -34,5 +30,7 @@ class AccountDebtPK implements Serializable {
 
     @Getter
     private int id_account;
+    @Getter
+    private int id_account_owed;
 }
 
