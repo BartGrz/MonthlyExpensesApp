@@ -72,10 +72,6 @@ public class AccountService {
         logger.info("account balance with id:" + id_account + " has been updated");
     }
 
-    //TODO : must implement method which will check if one account
-    // is already owe money to another account, then update it
-    // , if not it should insert new row into table
-
     /**
      * based on bill given and list of accounts, method will calculate how much other accounts owe to the account which pay for bill.
      *
