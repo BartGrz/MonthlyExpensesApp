@@ -14,15 +14,14 @@ public class AccountDebt {
     @EmbeddedId
     @Getter
     private AccountDebtPK id;
-    @Getter
-    @Setter
-    private double debt;
     @OneToOne
     @JoinColumn(name = "id_account" ,updatable = false, insertable = false)
     @Getter
     @Setter
     private Account account;
-
+    @Getter
+    @Setter
+    private double debt;
 }
 
 @Embeddable
@@ -32,5 +31,6 @@ class AccountDebtPK implements Serializable {
     private int id_account;
     @Getter
     private int id_account_owed;
+
 }
 

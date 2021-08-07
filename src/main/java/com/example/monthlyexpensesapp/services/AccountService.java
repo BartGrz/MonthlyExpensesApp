@@ -1,9 +1,8 @@
 package com.example.monthlyexpensesapp.services;
 
+
 import com.example.monthlyexpensesapp.adapter.AccountRepository;
-import com.example.monthlyexpensesapp.models.Account;
-import com.example.monthlyexpensesapp.models.Bill;
-import com.example.monthlyexpensesapp.models.Product;
+import com.example.monthlyexpensesapp.models.*;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,24 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
+    }
+    public Optional<Account> getAccountByName(String name) {
+
+        var account = accountRepository.findByName(name).get();
+        if(Optional.of(account).isEmpty()) {
+            throw new IllegalArgumentException("category with given name does not exist");
+        }
+        return Optional.of(account);
+    }
+
+    /**
+     * creating new account based on body send from post method
+     * @param account
+     * @return created account
+     */
     public Account creatingAccount(Account account) {
         if (accountRepository.existsById(account.getId_account())) {
             throw new IllegalStateException("Account already exist");

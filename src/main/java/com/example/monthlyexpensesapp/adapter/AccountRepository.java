@@ -19,11 +19,13 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     Account save(Account entity);
     void delete(Account account);
     boolean existsById(Integer id);
+    @Query("select ac from Account ac where ac.account_name=:name")
+    Optional<Account> findByName(@Param("name") String name);
+
     @Transactional
     @Modifying
     @Query(nativeQuery = true, value = "insert into ACCOUNT_DEBT (ID_ACCOUNT, DEBT,ID_ACCOUNT_OWED) VALUES (:id_account,:debt,:id_account_owed)")
     void saveToAccountDebt(@Param("id_account") int id_account,@Param("id_account_owed") int id_account_owed,@Param("debt") double debt);
-
     @Transactional
     @Modifying
     @Query(nativeQuery = true, value = "UPDATE ACCOUNT_BALANCE set BALANCE=:balance where ID_ACCOUNT=:id_account")
