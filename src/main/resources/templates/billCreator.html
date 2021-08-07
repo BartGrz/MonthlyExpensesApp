@@ -7,15 +7,20 @@
 </head>
 <body>
 <main>
-
     <form action="#" method="post" th:action="@{/create-bill}" th:object="${new_bill}">
         <fieldset>
             <legend>Bill info</legend>
             <label>shop name
-                <input type="text" name="shop_name" th:field="*{shop_name}" >
+                <select th:field="*{shop_name}">
+                    <option th:each="shop : ${shops}" th:value="${shop.getShop_name()}"
+                            th:text="${shop.getShop_name()}"/>
+                </select>
             </label>
             <label>account name
-                <input type="text"  name="account_name" th:field="*{account_name}">
+                <select th:field="*{account_name}">
+                    <option th:each="account : ${accounts}" th:value="${account.getAccount_name()}"
+                            th:text="${account.getAccount_name()}"/>
+                </select>
             </label>
             <fieldset th:each="product, productStep : *{productList}">
                 <legend th:text="|product ${productStep.index+1}|"/>
@@ -47,3 +52,4 @@
 </html>
 
 <!--"*{shops[__${shopSteps.index}__].getId_shop()}"!-->
+<!-- <input type="text" name="shop_name" th:field="*{shop_name}" >!-->
