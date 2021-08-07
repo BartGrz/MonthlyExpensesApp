@@ -5,9 +5,9 @@ import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,22 +19,21 @@ public class BillService {
     private AccountRepository accountRepository;
     private ShopRepository shopRepository;
     private ProductRepository productRepository;
+    private ProductService productService;
 
     public BillService(BillRepository billRepository, ShopRepository shopRepository,
-                       AccountRepository accountRepository, ProductRepository productRepository
-    ) {
+                       AccountRepository accountRepository, ProductRepository productRepository,
+                       ProductService productService) {
         this.billRepository = billRepository;
         this.shopRepository = shopRepository;
         this.accountRepository = accountRepository;
         this.productRepository = productRepository;
+        this.productService = productService;
     }
 
 
-    public Bill openbill(Bill bill, int id_shop, int id_account) {
+    public Bill openbill(int id_shop, int id_account, LocalDate localDate) {
 
-        if (billRepository.existsById(bill.getId_bill())) {
-            throw new IllegalArgumentException("Bill already exist");
-        }
         if (!accountRepository.existsById(id_account)) {
             throw new IllegalArgumentException("account does not exist");
         }
@@ -43,12 +42,14 @@ public class BillService {
         }
         var account = accountRepository.findById(id_account).get();
         var shop = shopRepository.findById(id_shop).get();
+        var bill = new Bill();
         bill.setAccount(account);
         bill.setShop(shop);
+        bill.setGroup_date(localDate);
         var created = billRepository.save(bill);
         billRepository.saveBilltoBillSum(created.getId_bill(), 0);
         logger.info("bill created with id = " + created.getId_bill() + " with shop " + shop.getShop_name() + " account " + account.getAccount_name());
-        return bill;
+        return created;
     }
 
     public Bill deleteBill(int id_bill) {
@@ -84,7 +85,6 @@ public class BillService {
         var sum = billRepository.getBillSumById(bill.getId_bill());
         // var balance = sum+ accountRepository.getAccountDebtById(bill.getAccount().getId_account());
         accountRepository.updateAccountBalance(sum, bill.getAccount().getId_account());
-
     }
 
     public List<Product> getAllProducts(int id_bill) {
@@ -119,8 +119,8 @@ public class BillService {
             throw new IllegalStateException("product with  given id=" + toUpdate.getId_product() + " does not exist ");
         }
         var bill = billRepository.findById(id_bill).get();
+        bill.set_closed(false);
         var product = bill.getProducts().stream().filter(prod -> prod.getId_product() == toUpdate.getId_product()).findAny().get();
-
         product.updateFrom(toUpdate);
         var updated = productRepository.save(product);
         logger.info("success ! product with id =" + product.getId_product() + " from bill with id=" + id_bill + " changed ");
@@ -139,10 +139,16 @@ public class BillService {
         }
         bill.set_closed(true);
         var updated = billRepository.save(bill);
-
-
         logger.info("Bill is closed successfully, sum will be calculated");
-        sumWholeBill(bill);
+        sumWholeBill(updated);
+    }
+    public void addProductToExistingBill(Product toCreate, int id_category, int id_bill,int id_account) {
+
+      productService.addProductToExistingBill(toCreate,id_category,id_bill,id_account);
+    }
+    public void addProductToExistingBill(Product toCreate, int id_bill,int id_account) {
+
+        productService.addProductToExistingBill(toCreate,id_bill,id_account);
     }
 }
 

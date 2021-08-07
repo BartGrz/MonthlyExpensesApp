@@ -1,8 +1,10 @@
 package com.example.monthlyexpensesapp.adapter;
 
+import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.models.Shop;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +18,6 @@ public interface ShopRepository extends JpaRepository<Shop,Integer> {
     Optional<Shop> findById(Integer integer);
     @Override
     void delete(Shop shop);
+    @Query("select s from Shop s where s.shop_name=:name")
+    Optional<Shop> findByName(@Param("name") String name);
 }

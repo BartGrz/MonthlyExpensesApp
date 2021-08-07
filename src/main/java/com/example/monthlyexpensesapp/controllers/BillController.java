@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -43,11 +44,11 @@ public class BillController {
 
     @PostMapping("/")
     ResponseEntity<Bill> openBill(@RequestBody Bill toCreate, @RequestParam int id_shop, @RequestParam int id_account) {
-        var bill = billService.openbill(toCreate, id_shop, id_account);
+        var bill = billService.openbill(id_shop, id_account,toCreate.getGroup_date());
         if (bill == null) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.created(URI.create("/" + bill.getId_bill())).body(toCreate);
+        return ResponseEntity.created(URI.create("/" + bill.getId_bill())).body(bill);
 
     }
 

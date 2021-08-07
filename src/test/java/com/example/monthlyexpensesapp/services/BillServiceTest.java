@@ -8,8 +8,6 @@ import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.models.Bill;
 import com.example.monthlyexpensesapp.models.Product;
 import com.example.monthlyexpensesapp.models.Shop;
-import jdk.jfr.Description;
-import org.hamcrest.core.DescribedAs;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -33,6 +31,7 @@ class BillServiceTest {
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
+        var productService = mock(ProductService.class);
         var bill = new Bill();
         bill.setGroup_date(LocalDate.of(2021, 7, 5));
         Field getIdField = bill.getClass().getDeclaredField("id_bill");
@@ -50,7 +49,7 @@ class BillServiceTest {
         readField_account.setAccessible(true);
         readField_account.set(account, 1);
 
-        var billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        var billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
 
         //when
         when(billRepo.existsById(1)).thenReturn(false);
@@ -69,7 +68,7 @@ class BillServiceTest {
         assertEquals(bill.getId_bill(), 1);
 
         //under test
-        billService.openbill(bill, 1, 1);
+        billService.openbill(1, 1,LocalDate.now());
 
     }
 
@@ -81,6 +80,7 @@ class BillServiceTest {
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
+        var productService = mock(ProductService.class);
         var bill = new Bill();
 
         bill.setGroup_date(LocalDate.of(2021, 7, 5));
@@ -98,7 +98,7 @@ class BillServiceTest {
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
         //under test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
         billService.deleteBill(1);
     }
 
@@ -109,6 +109,7 @@ class BillServiceTest {
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
+        var productService = mock(ProductService.class);
         var bill = new Bill();
         Field getIdField = bill.getClass().getDeclaredField("id_bill");
         getIdField.setAccessible(true);
@@ -126,7 +127,7 @@ class BillServiceTest {
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
 
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
         billService.sumWholeBill(bill);
     }
 
@@ -137,6 +138,7 @@ class BillServiceTest {
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
+        var productService = mock(ProductService.class);
         Bill bill = new Bill();
         Field getIdField = bill.getClass().getDeclaredField("id_bill");
         getIdField.setAccessible(true);
@@ -154,7 +156,7 @@ class BillServiceTest {
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
 
         //test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
         billService.getAllProducts(1);
 
     }
@@ -167,6 +169,7 @@ class BillServiceTest {
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
+        var productService = mock(ProductService.class);
         var product = new Product();
         Field getProductId = product.getClass().getDeclaredField("id_product");
         getProductId.setAccessible(true);
@@ -190,7 +193,7 @@ class BillServiceTest {
         when(productRepository.findById(1)).thenReturn(Optional.of(product));
 
 
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
         Exception exceptionBillWrongId = assertThrows(IllegalStateException.class,
                 () -> billService.updateProduct(2, product));
         Exception exceptionProductDoesNotExist = assertThrows(IllegalStateException.class,
@@ -211,6 +214,7 @@ class BillServiceTest {
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
+        var productService = mock(ProductService.class);
         var product = new Product();
         Field getProductId = product.getClass().getDeclaredField("id_product");
         getProductId.setAccessible(true);
@@ -227,7 +231,7 @@ class BillServiceTest {
         assertThat(bill.getProducts()).isEqualTo(products);
         when(billRepo.existsById(1)).thenReturn(false);
         //under test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
         Exception exceptionWrongId = assertThrows(IllegalArgumentException.class, () -> billService.toogleBill(1));
         String message = exceptionWrongId.getMessage();
         assertThat(message).isEqualTo(exceptionWrongId.getMessage());
@@ -240,6 +244,7 @@ class BillServiceTest {
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
+        var productService = mock(ProductService.class);
         var product = new Product();
         Field getProductId = product.getClass().getDeclaredField("id_product");
         getProductId.setAccessible(true);
@@ -257,7 +262,7 @@ class BillServiceTest {
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
         //test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
         assertDoesNotThrow(() -> billService.toogleBill(1));
     }
 
