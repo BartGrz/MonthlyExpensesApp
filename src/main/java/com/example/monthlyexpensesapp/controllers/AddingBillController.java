@@ -3,16 +3,22 @@ package com.example.monthlyexpensesapp.controllers;
 import com.example.monthlyexpensesapp.adapter.CategoryRepository;
 import com.example.monthlyexpensesapp.adapter.ShopRepository;
 import com.example.monthlyexpensesapp.logic.BillWriteModel;
+import com.example.monthlyexpensesapp.models.Account;
+import com.example.monthlyexpensesapp.models.Category;
 import com.example.monthlyexpensesapp.models.Product;
+import com.example.monthlyexpensesapp.models.Shop;
 import com.example.monthlyexpensesapp.services.AccountService;
 import com.example.monthlyexpensesapp.services.BillService;
+import org.apache.tomcat.jni.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 //TODO: need to get List<Shop> List<Account> , add it to the <select> in html, so it can be find via model method
 @Controller
@@ -33,8 +39,11 @@ public class AddingBillController {
 
     @GetMapping("")
     public String showBill(Model model) {
-        // var shops = shopRepository.findAll();
-        // var accounts = accountService.getAllAccounts();
+
+        model.addAttribute("shops", getShops());
+        model.addAttribute("accounts", getAccounts());
+        model.addAttribute("categories", getCategories());
+        model.addAttribute("dates", getDates());
         model.addAttribute("new_bill", new BillWriteModel());
         return "billCreator";
     }
@@ -48,12 +57,17 @@ public class AddingBillController {
      * @return
      */
     @PostMapping(params = "addProduct")
-    String addProjectStep(@ModelAttribute("new_bill") BillWriteModel current) {
+    String addProjectStep(@ModelAttribute("new_bill") BillWriteModel current, Model model) {
+
         current.getProductList().forEach(product -> {
             product.setAccount(accountService.getAccountByName(product.getAccount().getAccount_name()).get());
             product.setCategory(categoryRepository.findByName(product.getCategory().getCategory_name()).get());
         });
         current.getProductList().add(new Product());
+        model.addAttribute("shops", getShops());
+        model.addAttribute("accounts", getAccounts());
+        model.addAttribute("categories", getCategories());
+        model.addAttribute("dates", getDates());
         return "billCreator";
 
     }
@@ -82,6 +96,11 @@ public class AddingBillController {
         billService.toogleBill(bill.getId_bill());
         accountService.updateDebtOfAccounts(bill);
         model.addAttribute("message", "bill added");
+        model.addAttribute("shops", getShops());
+        model.addAttribute("accounts", getAccounts());
+        model.addAttribute("categories", getCategories());
+        model.addAttribute("dates", getDates());
+        model.addAttribute("new_bill", new BillWriteModel());
         return "billCreator";
     }
 
@@ -94,4 +113,33 @@ public class AddingBillController {
     ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    private List<Shop> getShops() {
+        return shopRepository.findAll();
+    }
+
+    private List<Account> getAccounts() {
+        return accountService.getAllAccounts();
+    }
+
+    private List<Category> getCategories() {
+        return categoryRepository.findAll();
+    }
+
+    private List<LocalDate> getDates(int... period) {
+        var dates = new ArrayList<LocalDate>();
+        if (period.length == 0) {
+            for (int i = 0; i < 31; i++) {
+                dates.add(LocalDate.now().minusDays(i));
+            }
+            return dates;
+        } else {
+            for (int i = 0; i < period.length; i++) {
+                dates.add(LocalDate.now().minusDays(i));
+            }
+            return dates;
+        }
+    }
+
+
 }

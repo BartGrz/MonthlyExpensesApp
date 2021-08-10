@@ -84,7 +84,6 @@ public class ProductService {
         toCreate.setBill(bill);
         toCreate.setAccount(account);
         var created = productRepository.save(toCreate);
-        logger.warn("added product " + toCreate.toString());
         return created;
     }
 
