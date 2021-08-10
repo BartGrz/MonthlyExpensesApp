@@ -23,6 +23,12 @@
                             th:text="${account.getAccount_name()}"/>
                 </select>
             </label>
+            <label>date
+                <select th:field="*{bill_date}">
+                    <option th:each="date : ${dates}" th:value="${date}"
+                            th:text="${date}"/>
+                </select>
+            </label>
             <fieldset th:each="product, productStep : *{productList}">
                 <legend th:text="|product ${productStep.index+1}|"/>
                 <lable>product name
@@ -51,8 +57,13 @@
                 <button type="submit" name="addProduct">+</button>
             </div>
         </fieldset>
-
         <input type="submit" name="confirm" value="confirm">
+    </form>
+    <form action="#" method="get" th:action="@{/main}">
+        <fieldset>
+            <label>Back to main page</label>
+            <button type="submit"><--</button>
+        </fieldset>
     </form>
 </main>
 </body>
