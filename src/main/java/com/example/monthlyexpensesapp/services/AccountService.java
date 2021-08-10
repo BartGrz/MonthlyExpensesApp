@@ -116,13 +116,15 @@ public class AccountService {
             var debt = productsMap.get(account.getId_account())
                     .stream().mapToDouble(Product::getProduct_price)
                     .sum();
-            if (!accountRepository.existsById_debtor(account.getId_account(), bill.getAccount().getId_account())) {
+            if(debt==0) { //that means account is not mentioned on bill
+
+            } else if (!accountRepository.existsById_debtor(account.getId_account(), bill.getAccount().getId_account())) {
                 var total = debt+accountRepository.getAccountDebtById(account.getId_account(),bill.getAccount().getId_account());
                 accountRepository.updateAccountDebt(total, bill.getAccount().getId_account(), account.getId_account());
-                logger.warn("debt for id " + account.getId_account() + " == " + total + " account owe money to " + bill.getAccount().getId_account());
+                logger.warn(  account.getAccount_name()  + "  owe " + total+ " int total to " + bill.getAccount().getAccount_name());
             } else {
                 accountRepository.saveToAccountDebt(account.getId_account(), bill.getAccount().getId_account(), debt);
-                logger.info("adding new debt , account id =" + account.getId_account() + " owes  " + debt + " to id=" + bill.getAccount().getId_account());
+                logger.info("adding new debt , account : " + account.getAccount_name() + " owes  " + debt + " to =" + bill.getAccount().getAccount_name());
             }
         });
 

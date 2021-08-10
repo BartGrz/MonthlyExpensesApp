@@ -28,7 +28,7 @@ public class BillWriteModel {
     public String account_name;
     @Getter
     @Setter
-    public String date;
+    public String bill_date;
 
     @Autowired
     public void setBillService(BillService billService) {

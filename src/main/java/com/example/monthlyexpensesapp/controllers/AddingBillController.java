@@ -79,7 +79,11 @@ public class AddingBillController {
      * @return
      */
     @PostMapping()
-    public String addBill(@ModelAttribute("new_bill") BillWriteModel billWriteModel, @RequestParam("account_name") String account_name, @RequestParam("shop_name") String shop_name, Model model) {
+    public String addBill(@ModelAttribute("new_bill") BillWriteModel billWriteModel,
+                          @RequestParam("account_name") String account_name,
+                          @RequestParam("shop_name") String shop_name,
+                          @RequestParam("bill_date") String date, Model model) {
+
         var list = billWriteModel.getProductList();
         list.forEach(product -> {
             product.setAccount(accountService.getAccountByName(product.getAccount().getAccount_name()).get());
@@ -87,7 +91,7 @@ public class AddingBillController {
         });
         var account = accountService.getAccountByName(account_name).get();
         var shop = shopRepository.findByName(shop_name).get();
-        var bill = billService.openbill(shop.getId_shop(), account.getId_account(), LocalDate.now());
+        var bill = billService.openbill(shop.getId_shop(), account.getId_account(), LocalDate.parse(date));
         bill.setProducts(new HashSet<>(list));
         list.forEach(product -> {
             product.setBill(bill);
