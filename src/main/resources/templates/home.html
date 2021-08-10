@@ -5,40 +5,24 @@
 
 </HEAD>
 <body>
-adding product
 <br>
-<br>
-
-
-
-<br>
-<input type="submit"  value="products" id="click"  >
-
-
-
-    <input type="text" id="category" >
-    <input  type="text" id="shop">
-    <input  type="text" id="account">
-
-
-    <tr th:each="products : ${products}">
-    <td th:text="${products.getProduct_name()}"/>
-
-<script>
-
-    document.getElementById("click").onclick = function () {
-        var category = document.getElementById("category").value;
-        var shop = document.getElementById("shop").value;
-        var account = document.getElementById("account").value;
-        window.open("http://localhost:8080/products/?id_category="+category+"&id_shop="+shop+"&id_account="+account);
-
-
-
-    }
-
-</script>
+<form action="#" method="get" th:action="@{/create-bill}">
+    <fieldset>
+        <label>Click to add bill</label>
+        <div>
+            <button type="submit">+</button>
+        </div>
+    </fieldset>
+</form>
+<form action="#" method="get" th:action="@{/bills}">
+<!-- need to parse json from this get method not change the annotation and ResponseEntity to regular Java.Lang.String and return template!-->
+    <fieldset>
+        <label>show bills</label>
+        <div>
+            <button type="submit">+</button>
+        </div>
+    </fieldset>
+</form>
 
 </body>
-
-
 </html>
