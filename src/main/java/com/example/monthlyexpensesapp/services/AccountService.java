@@ -124,7 +124,7 @@ public class AccountService {
                 logger.warn(  account.getAccount_name()  + "  owe " + total+ " int total to " + bill.getAccount().getAccount_name());
             } else {
                 accountRepository.saveToAccountDebt(account.getId_account(), bill.getAccount().getId_account(), debt);
-                logger.info("adding new debt , account : " + account.getAccount_name() + " owes  " + debt + " to =" + bill.getAccount().getAccount_name());
+                logger.info("adding new debt , account : " + account.getAccount_name() + " owes  " + debt + " to " + bill.getAccount().getAccount_name());
             }
         });
 
