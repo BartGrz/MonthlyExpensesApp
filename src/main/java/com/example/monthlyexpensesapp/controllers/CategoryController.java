@@ -42,9 +42,8 @@ public class CategoryController {
     }
     @PostMapping("/category")
     ResponseEntity<Category> createCategory(@RequestParam("category_name") String name) {
-
+       
        Category category =  categoryService.addNewCategory(name);
-
         return ResponseEntity.created(URI.create("/"+category.getId_category())).body(category);
 
     }
@@ -65,14 +64,18 @@ public class CategoryController {
 
     @DeleteMapping("/category/{id}")
     ResponseEntity<Category> deleteAccount (@PathVariable int id, Model model) {
-     
-     categoryService.deleteCategory(id);
-        model.addAttribute("message","category deleted succesfully");
-
+    
+            categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
+ 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<String> illegalArgHandler(IllegalArgumentException e) {
      return ResponseEntity.badRequest().body(e.getMessage());
     }
+    @ExceptionHandler(IllegalStateException.class)
+    ResponseEntity<String> illegalStateHandler(IllegalStateException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+   
 }

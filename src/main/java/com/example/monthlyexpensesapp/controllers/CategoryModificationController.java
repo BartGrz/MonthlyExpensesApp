@@ -26,13 +26,12 @@ public class CategoryModificationController {
     public String deleteCategory(Model model) {
         var categories = categoryService.getCategories();
         model.addAttribute("categories",categories);
-       
         return "deleteCategory";
     }
     
     @ExceptionHandler(IllegalStateException.class)
     ResponseEntity<String> illegalStateHandler(IllegalStateException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.badRequest().body(e.getLocalizedMessage());
     }
     
 }
