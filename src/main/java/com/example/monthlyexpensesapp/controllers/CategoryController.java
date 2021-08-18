@@ -3,7 +3,9 @@ package com.example.monthlyexpensesapp.controllers;
 import com.example.monthlyexpensesapp.adapter.CategoryRepository;
 import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.models.Category;
+import com.example.monthlyexpensesapp.services.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -13,10 +15,12 @@ import java.util.List;
 public class CategoryController {
 
     private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
 
-    public CategoryController(CategoryRepository categoryRepository) {
+    public CategoryController(CategoryRepository categoryRepository, CategoryService categoryService) {
         this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
     }
 
     @GetMapping("/category")
@@ -37,11 +41,11 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
     @PostMapping("/category")
-    ResponseEntity<Category> createCategory(@RequestBody Category toCreate) {
+    ResponseEntity<Category> createCategory(@RequestParam("category_name") String name) {
 
-       Category category =  categoryRepository.save(toCreate);
+       Category category =  categoryService.addNewCategory(name);
 
-        return ResponseEntity.created(URI.create("/"+category.getId_category())).body(toCreate);
+        return ResponseEntity.created(URI.create("/"+category.getId_category())).body(category);
 
     }
 
@@ -60,14 +64,15 @@ public class CategoryController {
     }
 
     @DeleteMapping("/category/{id}")
-    ResponseEntity<Account> deleteAccount (@PathVariable int id) {
-
-        if(!categoryRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        Category category = categoryRepository.findById(id).get();
-        categoryRepository.delete(category);
+    ResponseEntity<Category> deleteAccount (@PathVariable int id, Model model) {
+     
+     categoryService.deleteCategory(id);
+        model.addAttribute("message","category deleted succesfully");
 
         return ResponseEntity.noContent().build();
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<String> illegalArgHandler(IllegalArgumentException e) {
+     return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

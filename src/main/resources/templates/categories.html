@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
+<head>
+    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+</head>
+<body>
+
+<form action="#" th:action="@{/category}" method="post" th:object="${category}">
+    <legend>Adding new category</legend>
+    <fieldset>
+        <lable>category name
+            <input type="text" th:field="${category.category_name}" name="category_name">
+        </lable>
+    </fieldset>
+    <input type="submit" name="confirm" value="confirm" onclick="deleteMethod()">
+</form>
+</body>
+</html>
+<script>
+    class RequestsHttp {
+
+        // Make an HTTP PUT Request
+        async post(url) {
+
+            // Awaiting fetch which contains
+            // method, headers and content-type
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            });
+        }
+
+        async refresh(url) {
+
+            // Awaiting fetch which contains
+            // method, headers and content-type
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            });
+        }
+    }
+
+    // Instantiating new EasyHTTP class
+    const http = new RequestsHttp;
+
+    // Update Post
+    function deleteMethod() {
+        alert('category added')
+        http.refresh('http://localhost:8080/categories');
+
+    }
+</script>

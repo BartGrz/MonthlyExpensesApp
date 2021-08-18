@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:tx="http://www.w3.org/1999/xhtml">
 
 <HEAD>
-
+    <link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
 </HEAD>
 <body>
 <br>
@@ -19,10 +19,26 @@
     <fieldset>
         <label>show bills</label>
         <div>
+            <button type="submit">--></button>
+        </div>
+    </fieldset>
+</form>
+<form action="#" method="get" th:action="@{/categories}">
+    <!-- need to parse json from this get method not change the annotation and ResponseEntity to regular Java.Lang.String and return template!-->
+    <fieldset>
+        <label>add category</label>
+        <div>
             <button type="submit">+</button>
         </div>
     </fieldset>
 </form>
-
+<form action="#" method="get" th:action="@{/delete-category}">
+    <fieldset>
+        <label>delete category</label>
+        <div>
+            <button type="submit">-</button>
+        </div>
+    </fieldset>
+</form>
 </body>
 </html>

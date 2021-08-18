@@ -2,9 +2,9 @@ package com.example.monthlyexpensesapp.controllers;
 
 import com.example.monthlyexpensesapp.models.Category;
 import com.example.monthlyexpensesapp.adapter.CategoryRepository;
+import com.example.monthlyexpensesapp.services.CategoryService;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 
@@ -14,7 +14,8 @@ class CategoryControllerTest {
     void readById() {
 
             CategoryRepository categoryRepository = mock(CategoryRepository.class);
-            CategoryController categoryController = new CategoryController(categoryRepository);
+            var categoryService = mock(CategoryService.class);
+            CategoryController categoryController = new CategoryController(categoryRepository, categoryService);
             categoryController.readById(anyInt());
 
         }
@@ -23,7 +24,8 @@ class CategoryControllerTest {
     void updateCategory() {
 
         CategoryRepository categoryRepository = mock(CategoryRepository.class);
-        CategoryController categoryController = new CategoryController(categoryRepository);
+        var categoryService = mock(CategoryService.class);
+        CategoryController categoryController = new CategoryController(categoryRepository, categoryService);
         categoryController.updateCategory(mock(Category.class),anyInt());
         
 
