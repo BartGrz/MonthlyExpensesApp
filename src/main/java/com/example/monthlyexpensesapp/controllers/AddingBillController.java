@@ -22,7 +22,6 @@ import java.util.List;
 
 //TODO: need to get List<Shop> List<Account> , add it to the <select> in html, so it can be find via model method
 @Controller
-@RequestMapping("/create-bill")
 public class AddingBillController {
 
     private BillService billService;
@@ -37,7 +36,12 @@ public class AddingBillController {
         this.categoryRepository = categoryRepository;
     }
 
-    @GetMapping("")
+    @GetMapping("/bills-panel")
+    public String mainPanel() {
+        return "bills-panel";
+    }
+
+    @GetMapping("/create-bill")
     public String showBill(Model model) {
 
         model.addAttribute("shops", getShops());
@@ -99,6 +103,7 @@ public class AddingBillController {
         });
         billService.toogleBill(bill.getId_bill());
         accountService.updateDebtOfAccounts(bill);
+
         model.addAttribute("message", "bill added");
         model.addAttribute("shops", getShops());
         model.addAttribute("accounts", getAccounts());

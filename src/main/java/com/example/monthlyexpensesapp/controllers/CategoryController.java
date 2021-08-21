@@ -41,24 +41,18 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
     @PostMapping("/category")
-    ResponseEntity<Category> createCategory(@RequestParam("category_name") String name) {
+    ResponseEntity<Category> createCategory(@RequestBody Category toCreate) {
        
-       Category category =  categoryService.addNewCategory(name);
-        return ResponseEntity.created(URI.create("/"+category.getId_category())).body(category);
+       Category category =  categoryService.addNewCategory(toCreate);
+        return ResponseEntity.created(URI.create("/"+category.getId_category())).body(toCreate);
 
     }
 
     @PutMapping("/category/{id}")
     ResponseEntity<Category> updateCategory (@RequestBody Category toUpdate, @PathVariable int id) {
 
-        if(!categoryRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        categoryRepository.findById(id).ifPresent(category -> {
+       categoryService.updateCategory(id,toUpdate);
 
-         category.updateFrom(toUpdate);
-         categoryRepository.save(category);
-        });
         return ResponseEntity.noContent().build();
     }
 

@@ -23,11 +23,7 @@ class CategoryControllerTest {
     @Test
     void updateCategory() {
 
-        CategoryRepository categoryRepository = mock(CategoryRepository.class);
-        var categoryService = mock(CategoryService.class);
-        CategoryController categoryController = new CategoryController(categoryRepository, categoryService);
-        categoryController.updateCategory(mock(Category.class),anyInt());
-        
+
 
     }
 }

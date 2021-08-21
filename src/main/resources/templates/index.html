@@ -5,40 +5,19 @@
     <link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
 </HEAD>
 <body>
-<br>
-<form action="#" method="get" th:action="@{/create-bill}">
-    <fieldset>
-        <label>Click to add bill</label>
-        <div>
-            <button type="submit">+</button>
-        </div>
-    </fieldset>
-</form>
-<form action="#" method="get" th:action="@{/bills}">
-<!-- need to parse json from this get method not change the annotation and ResponseEntity to regular Java.Lang.String and return template!-->
-    <fieldset>
-        <label>show bills</label>
-        <div>
-            <button type="submit">--></button>
-        </div>
-    </fieldset>
-</form>
-<form action="#" method="get" th:action="@{/categories}">
-    <!-- need to parse json from this get method not change the annotation and ResponseEntity to regular Java.Lang.String and return template!-->
-    <fieldset>
-        <label>add category</label>
-        <div>
-            <button type="submit">+</button>
-        </div>
-    </fieldset>
-</form>
-<form action="#" method="get" th:action="@{/delete-category}">
-    <fieldset>
-        <label>delete category</label>
-        <div>
-            <button type="submit">-</button>
-        </div>
-    </fieldset>
-</form>
+<fieldset>
+    <header>MONTHLY EXPENSES APP
+        <nav>
+            <ul>
+                <li>
+                    <a href="/categories-panel">Categories</a>
+                </li>
+                <li>
+                    <a href="/bills-panel">Bills</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+</fieldset>
 </body>
 </html>

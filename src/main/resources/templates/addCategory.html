@@ -8,14 +8,14 @@
 </head>
 <body>
 
-<form action="#" th:action="@{/category}" method="post" th:object="${category}">
+<form >
     <legend>Adding new category</legend>
     <fieldset>
         <lable>category name
-            <input type="text" th:field="${category.category_name}" name="category_name">
+            <input type="text" id="name">
         </lable>
     </fieldset>
-    <input type="submit" name="confirm" value="confirm" onclick="deleteMethod()">
+    <button type="button" name="confirm" value="confirm" onclick="addMethod()">Confirm</button>
 </form>
 </body>
 </html>
@@ -24,14 +24,17 @@
 
         // Make an HTTP PUT Request
         async post(url) {
-
+            const categoryObject = {category_name : document.getElementById("name").value}
             // Awaiting fetch which contains
             // method, headers and content-type
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
-                }
+                },
+                body: JSON.stringify(categoryObject)
+            }).then(response=> {
+                return response.json()
             });
         }
 
@@ -52,9 +55,11 @@
     const http = new RequestsHttp;
 
     // Update Post
-    function deleteMethod() {
+    function addMethod() {
+        http.post('http://localhost:8080/category')
+        document.getElementById("name").value = ""
         alert('category added')
-        http.refresh('http://localhost:8080/categories');
+        http.refresh('http://localhost:8080/add-category');
 
     }
 </script>
