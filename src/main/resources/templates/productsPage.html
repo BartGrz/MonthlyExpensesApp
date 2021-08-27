@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>products</title>
+</head>
+<title>
+    test
+</title>
+<body>
+<form method="get" th:object="${com.example.monthlyexpensesapp.controllers.ProductController}">
+
+
+<input th:each="products : ${products}" >
+<input th:name="products" th:value="${products}">
+
+</form>
+
+
+</body>
+</html>

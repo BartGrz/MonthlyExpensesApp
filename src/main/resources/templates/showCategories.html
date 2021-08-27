@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
+<head>
+    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+</head>
+<body>
+<Legend>Categories</Legend>
+<fieldset >
+    <ul th:each="category : ${categories}">
+        <dd>
+        <li>
+            <div th:text="${category.category_name}"/>
+        </li>
+        </dd>
+    </ul>
+</fieldset>
+</body>
+</html>
