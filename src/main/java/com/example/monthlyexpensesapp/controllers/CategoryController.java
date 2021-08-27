@@ -4,14 +4,18 @@ import com.example.monthlyexpensesapp.adapter.CategoryRepository;
 import com.example.monthlyexpensesapp.models.Account;
 import com.example.monthlyexpensesapp.models.Category;
 import com.example.monthlyexpensesapp.services.CategoryService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.print.attribute.standard.Media;
+import java.awt.*;
 import java.net.URI;
 import java.util.List;
 
-@RestController
+@Controller
 public class CategoryController {
 
     private CategoryRepository categoryRepository;
@@ -21,6 +25,11 @@ public class CategoryController {
     public CategoryController(CategoryRepository categoryRepository, CategoryService categoryService) {
         this.categoryRepository = categoryRepository;
         this.categoryService = categoryService;
+    }
+    @GetMapping("/show-categories")
+    String showCategories(Model model) {
+        model.addAttribute("categories",categoryService.getCategories());
+        return "showCategories";
     }
 
     @GetMapping("/category")
@@ -40,22 +49,23 @@ public class CategoryController {
         Category category = categoryRepository.findById(id).get();
         return ResponseEntity.ok(category);
     }
-    @PostMapping("/category")
+    @ResponseBody
+    @PostMapping(value = "/category", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Category> createCategory(@RequestBody Category toCreate) {
        
        Category category =  categoryService.addNewCategory(toCreate);
         return ResponseEntity.created(URI.create("/"+category.getId_category())).body(toCreate);
 
     }
-
-    @PutMapping("/category/{id}")
+    @ResponseBody
+    @PutMapping(value = "/category/{id}")
     ResponseEntity<Category> updateCategory (@RequestBody Category toUpdate, @PathVariable int id) {
 
        categoryService.updateCategory(id,toUpdate);
 
         return ResponseEntity.noContent().build();
     }
-
+    @ResponseBody
     @DeleteMapping("/category/{id}")
     ResponseEntity<Category> deleteAccount (@PathVariable int id, Model model) {
     

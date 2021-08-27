@@ -18,10 +18,6 @@ public class CategoryModificationController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/categories-panel")
-    public String mainPanel(){
-        return "categories-panel";
-    }
     @GetMapping("/add-category")
     public String addCategory(Model model) {
         model.addAttribute("category",new Category());
@@ -34,7 +30,6 @@ public class CategoryModificationController {
     }
     @GetMapping("/edit-category")
     public String editCategory(Model model) {
-
         model.addAttribute("categories",getCategories());
         return "editCategory";
     }
