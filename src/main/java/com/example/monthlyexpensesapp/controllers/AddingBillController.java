@@ -36,10 +36,6 @@ public class AddingBillController {
         this.categoryRepository = categoryRepository;
     }
 
-    @GetMapping("/bills-panel")
-    public String mainPanel() {
-        return "bills-panel";
-    }
 
     @GetMapping("/create-bill")
     public String showBill(Model model) {
@@ -60,7 +56,7 @@ public class AddingBillController {
      * @param current
      * @return
      */
-    @PostMapping(params = "addProduct")
+    @PostMapping(params = "addProduct",value = "create-bill")
     String addProjectStep(@ModelAttribute("new_bill") BillWriteModel current, Model model) {
 
         current.getProductList().forEach(product -> {
@@ -82,7 +78,7 @@ public class AddingBillController {
      * @param
      * @return
      */
-    @PostMapping()
+    @PostMapping("/create-bill")
     public String addBill(@ModelAttribute("new_bill") BillWriteModel billWriteModel,
                           @RequestParam("account_name") String account_name,
                           @RequestParam("shop_name") String shop_name,
