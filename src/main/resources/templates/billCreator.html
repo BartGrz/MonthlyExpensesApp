@@ -8,7 +8,7 @@
 <body>
 <main>
     <h1 th:if="${message !=null}" th:text="${message}"></h1>
-    <form action="#" method="post" th:action="@{/}" th:object="${new_bill}">
+    <form action="#" method="post" th:action="@{/create-bill}" th:object="${new_bill}">
         <fieldset>
             <legend>Bill info</legend>
             <label>shop name
