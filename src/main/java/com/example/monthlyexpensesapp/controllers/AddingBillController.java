@@ -9,7 +9,6 @@ import com.example.monthlyexpensesapp.models.Product;
 import com.example.monthlyexpensesapp.models.Shop;
 import com.example.monthlyexpensesapp.services.AccountService;
 import com.example.monthlyexpensesapp.services.BillService;
-import org.apache.tomcat.jni.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,9 +48,8 @@ public class AddingBillController {
     }
 
     /**
-     * adding new template for product specifics, every time post request is called,
-     * account and category is found by created for that methods (String is passed, not an object of a class)
-     * It must be changed, as soon as template will change from fields to <select></select> and chosing data from box
+     * adding new template for product specifics, every time post request is called
+     * Account name and category name are passed as String, and managed by repositories
      *
      * @param current
      * @return
@@ -73,8 +71,9 @@ public class AddingBillController {
     }
 
     /**
-     * early idea of post mapping method logic, should be much easier to read and understand
-     *
+     * Creating new Bill, adding collection of Product type to newly created instance of Bill class.
+     * Repositories and services interpret the Strings passed by template and create instances of
+     * classes needed to link product with account&category
      * @param
      * @return
      */
@@ -84,16 +83,16 @@ public class AddingBillController {
                           @RequestParam("shop_name") String shop_name,
                           @RequestParam("bill_date") String date, Model model) {
 
-        var list = billWriteModel.getProductList();
-        list.forEach(product -> {
+        var products_list = billWriteModel.getProductList();
+        products_list.forEach(product -> {
             product.setAccount(accountService.getAccountByName(product.getAccount().getAccount_name()).get());
             product.setCategory(categoryRepository.findByName(product.getCategory().getCategory_name()).get());
         });
         var account = accountService.getAccountByName(account_name).get();
         var shop = shopRepository.findByName(shop_name).get();
         var bill = billService.openbill(shop.getId_shop(), account.getId_account(), LocalDate.parse(date));
-        bill.setProducts(new HashSet<>(list));
-        list.forEach(product -> {
+        bill.setProducts(new HashSet<>(products_list));
+        products_list.forEach(product -> {
             product.setBill(bill);
             billService.addProductToExistingBill(product, product.getCategory().getId_category(), bill.getId_bill(), product.getAccount().getId_account());
         });
@@ -109,16 +108,6 @@ public class AddingBillController {
         return "billCreator";
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    ResponseEntity<String> handleIllegalState(IllegalStateException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
     private List<Shop> getShops() {
         return shopRepository.findAll();
     }
@@ -131,15 +120,15 @@ public class AddingBillController {
         return categoryRepository.findAll();
     }
 
-    private List<LocalDate> getDates(int... period) {
+    private List<LocalDate> getDates(int... range) {
         var dates = new ArrayList<LocalDate>();
-        if (period.length == 0) {
+        if (range.length == 0) {
             for (int i = 0; i < 31; i++) {
                 dates.add(LocalDate.now().minusDays(i));
             }
             return dates;
         } else {
-            for (int i = 0; i < period.length; i++) {
+            for (int i = 0; i < range.length; i++) {
                 dates.add(LocalDate.now().minusDays(i));
             }
             return dates;
