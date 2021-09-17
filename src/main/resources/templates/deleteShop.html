@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+    <link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
+    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+</head>
+</head>
+<body>
+<main>
+    <form>
+        <legend>Deleting category</legend>
+        <fieldset>
+            <label>Choose shop to delete
+                <select id="id_shop">
+                    <option th:each="shop : ${shops}" th:text="${shop.shop_name}" th:value="${shop.id_shop}"
+                    ></option>
+                </select>
+            </label>
+        </fieldset>
+        <button type="submit" value="confirm" onclick="deleteMethod()">confirm</button>
+    </form>
+    <br>
+    <form action="#" method="get" th:action="@{/shop-panel.html}">
+        <br>
+        <fieldset>
+            <label>Back to main page</label>
+            <button type="submit"><--</button>
+        </fieldset>
+</main>
+</body>
+</html>
+
+<script>
+    class RequestsHttp {
+
+        // Make an HTTP PUT Request
+        async delete(url) {
+
+            // Awaiting fetch which contains
+            // method, headers and content-type
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-type': 'application/json'
+
+                }
+            });
+        }
+
+        async refresh(url) {
+
+            // Awaiting fetch which contains
+            // method, headers and content-type
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            });
+        }
+    }
+
+    // Instantiating new EasyHTTP class
+    const http = new RequestsHttp;
+
+    // Update Post
+    function deleteMethod() {
+        http.delete('http://localhost:8080/shop/' + document.getElementById('id_shop').value);
+        alert("shop deleted !")
+
+    }
+
+</script>

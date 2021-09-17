@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
+<head>
+    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <title>Shops</title>
+</head>
+<body>
+<Legend>shop</Legend>
+<fieldset >
+    <ul th:each="shop : ${shops}">
+        <dd>
+            <li>
+                <div th:text="${shop.shop_name}"/>
+            </li>
+        </dd>
+    </ul>
+</fieldset>
+<br>
+</body>
+</html>

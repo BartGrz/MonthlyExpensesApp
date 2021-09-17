@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
+<head>
+    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+</head>
+<body>
+
+<form >
+    <legend>Adding new category</legend>
+    <fieldset>
+        <lable>Shop name
+            <input type="text" id="name">
+        </lable>
+    </fieldset>
+    <button type="button" name="confirm" value="confirm" onclick="addMethod()">Confirm</button>
+</form>
+</body>
+</html>
+<script>
+    class RequestsHttp {
+
+        async post(url) {
+            const shopObject = {shop_name : document.getElementById("name").value}
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(shopObject)
+            }).then(response=> {
+                return response.json()
+            });
+        }
+
+        async refresh(url) {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            });
+        }
+    }
+    // Instantiating new EasyHTTP class
+    const http = new RequestsHttp;
+
+    // Update Post
+    function addMethod() {
+        http.post('http://localhost:8080/shop')
+        document.getElementById("name").value = ""
+        alert('shop added')
+        http.refresh('http://localhost:8080/add-shop');
+
+    }
+</script>

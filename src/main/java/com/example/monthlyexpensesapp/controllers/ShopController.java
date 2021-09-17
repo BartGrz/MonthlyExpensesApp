@@ -4,7 +4,11 @@ import com.example.monthlyexpensesapp.models.Shop;
 import com.example.monthlyexpensesapp.adapter.ShopRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -12,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+@Controller
 public class ShopController {
     public static final Logger logger = LoggerFactory.getLogger(ShopController.class);
     private ShopRepository shopRepository;
@@ -21,6 +25,25 @@ public class ShopController {
         this.shopRepository = shopRepository;
     }
 
+    @GetMapping(value = "/show-shops")
+     String getAll(Model model) {
+        model.addAttribute("shops",getShops());
+        return "showAllShops";
+    }
+    @GetMapping(value = "/edit-shop")
+    String editShop(Model model) {
+        model.addAttribute("shops",getShops());
+        return "editShop";
+    }
+    @GetMapping(value = "/delete-shop")
+    String deleteShop(Model model) {
+       model.addAttribute("shops",getShops());
+        return "deleteShop";
+    }
+    @GetMapping(value = "/add-shop")
+    String addingNewShop(Model model) {
+        return "addShop";
+    }
     @GetMapping("/shop")
      ResponseEntity<List<Shop>> findAll() {
             logger.warn("exposing data");
@@ -68,6 +91,8 @@ public class ShopController {
         logger.warn("shop with id=" + id +  " deleted ");
         return ResponseEntity.noContent().build();
 
-
+    }
+    private List<Shop> getShops() {
+        return shopRepository.findAll();
     }
 }
