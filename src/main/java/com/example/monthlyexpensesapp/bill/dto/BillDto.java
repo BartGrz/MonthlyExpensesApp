@@ -1,0 +1,40 @@
+package com.example.monthlyexpensesapp.bill.dto;
+
+import com.example.monthlyexpensesapp.account.Account;
+import com.example.monthlyexpensesapp.product.Product;
+import com.example.monthlyexpensesapp.shop.Shop;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+public class BillDto {
+    @Getter
+    @Setter
+    private List<Product> products = new ArrayList<>();
+    @Getter
+    public String bill_date;
+    @Getter
+    private String shop_name;
+    @Getter
+    private String account_name;
+
+    public BillDto() {
+        products.add(new Product());
+    }
+
+
+    /*int getId_bill();
+    boolean isClosed();
+    Shop getShop();
+    Account getAccount();
+    LocalDate getGroup_date();
+    Set<Product> getProducts();*/
+
+
+}
