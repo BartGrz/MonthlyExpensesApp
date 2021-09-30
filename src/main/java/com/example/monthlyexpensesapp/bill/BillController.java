@@ -1,6 +1,7 @@
 package com.example.monthlyexpensesapp.bill;
 
 import com.example.monthlyexpensesapp.bill.dto.BillDto;
+import com.example.monthlyexpensesapp.controllers.IllegalExceptionProcessing;
 import com.example.monthlyexpensesapp.product.Product;
 import com.example.monthlyexpensesapp.account.AccountService;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
+@IllegalExceptionProcessing
 @RestController
 @RequestMapping("/bills")
 class BillController {

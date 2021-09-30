@@ -1,11 +1,12 @@
 package com.example.monthlyexpensesapp.account;
 
+import com.example.monthlyexpensesapp.controllers.IllegalExceptionProcessing;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-
+@IllegalExceptionProcessing
 @RestController
 public class AccountController {
 
