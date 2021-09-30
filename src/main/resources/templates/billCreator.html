@@ -29,25 +29,25 @@
                             th:text="${date}"/>
                 </select>
             </label>
-            <fieldset th:each="product, productStep : *{productList}">
+            <fieldset th:each="product, productStep : *{products}">
                 <legend th:text="|product ${productStep.index+1}|"/>
                 <lable>product name
-                    <input type="text" th:field="*{productList[__${productStep.index}__].product_name}">
+                    <input type="text" th:field="*{products[__${productStep.index}__].product_name}">
                 </lable>
                 <lable>note
-                    <input type="text" th:field="*{productList[__${productStep.index}__].product_note}">
+                    <input type="text" th:field="*{products[__${productStep.index}__].product_note}">
                 </lable>
                 <label>price
-                    <input type="number" th:field="*{productList[__${productStep.index}__].product_price}">
+                    <input type="number" th:field="*{products[__${productStep.index}__].product_price}">
                 </label>
                 <lable>category name
-                    <select th:field="*{productList[__${productStep.index}__].category.category_name}">
+                    <select th:field="*{products[__${productStep.index}__].category.category_name}">
                         <option th:each="category : ${categories}" th:value="${category.getCategory_name()}"
                                 th:text="${category.getCategory_name()}"/>
                     </select>
                 </lable>
                 <lable>account name
-                    <select th:field="*{productList[__${productStep.index}__].account.account_name}">
+                    <select th:field="*{products[__${productStep.index}__].account.account_name}">
                         <option th:each="account : ${accounts}" th:value="${account.getAccount_name()}"
                                 th:text="${account.getAccount_name()}"/>
                     </select>
