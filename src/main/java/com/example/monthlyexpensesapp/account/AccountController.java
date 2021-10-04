@@ -28,9 +28,9 @@ public class AccountController {
     }
 
     @GetMapping("/account/{id}")
-    ResponseEntity<AccountDto> readByID(@PathVariable int id) {
+    ResponseEntity<AccountDto> readById(@PathVariable int id) {
 
-        return accountQueryRepository.findBy(id)
+        return accountQueryRepository.findDtoById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

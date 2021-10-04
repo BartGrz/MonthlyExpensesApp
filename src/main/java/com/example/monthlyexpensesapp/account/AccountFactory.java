@@ -6,6 +6,7 @@ class AccountFactory {
 
    static Account from(AccountDto source) {
        var account = new Account();
+       account.assaignId(source.getId_account());
        account.setAccount_name(source.getAccount_name());
        account.setBills(source.getBills());
        return account;

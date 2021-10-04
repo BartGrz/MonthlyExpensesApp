@@ -21,7 +21,6 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
-    @NotNull
     private int id_account;
     @NotBlank(message = "account name cannot be blank")
     @Getter
