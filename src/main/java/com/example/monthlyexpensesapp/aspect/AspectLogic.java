@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Component
 @Aspect
 class AspectLogic {
@@ -18,8 +20,8 @@ class AspectLogic {
     void logInfoWhenBillIsClosed(JoinPoint jp){
         logger.info(" bill {} added and closed " , jp.getArgs());
     }
-    @After("execution (* com.example.monthlyexpensesapp.bill.BillService.sumWholeBill(..))")
+    @After("execution (* com.example.monthlyexpensesapp.account.AccountService.updateDebtOfAccounts(..))")
     void logAfterBillSumIsCalculated(JoinPoint jp){
-        logger.info("Bill summed {} , total cost " ,jp.getArgs());
+        logger.info("method {} with {}" , jp.getSignature().getName(),jp.getArgs());
     }
 }

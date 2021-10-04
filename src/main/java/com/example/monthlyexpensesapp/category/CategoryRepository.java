@@ -10,8 +10,8 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category,Integer> {
 
-    List<Category> findAll();
-    Optional<Category> findById(Integer integer);
+/*    List<Category> findAll();
+    Optional<Category> findById(Integer integer);*/
     Category save (Category category);
     void delete (Category category);
     @Override

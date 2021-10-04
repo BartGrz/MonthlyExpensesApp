@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Table
 @Entity(name = "Account_Balance")
@@ -24,5 +25,16 @@ class AccountBalancePK implements Serializable {
     @Getter
     private double balance;
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AccountBalancePK)) return false;
+        final AccountBalancePK that = (AccountBalancePK) o;
+        return id_account == that.id_account && Double.compare(that.balance, balance) == 0;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id_account, balance);
+    }
 }

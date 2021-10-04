@@ -34,4 +34,9 @@ public class Category {
         category_name = source.category_name;
     }
 
+    void assaignId(int id) {
+        this.id_category=id;
+    }
+
+
 }

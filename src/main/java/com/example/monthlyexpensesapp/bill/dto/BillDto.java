@@ -15,7 +15,6 @@ import java.util.Set;
 
 public class BillDto {
     @Getter
-    @Setter
     private List<Product> products = new ArrayList<>();
     @Getter
     public String bill_date;
@@ -27,14 +26,5 @@ public class BillDto {
     public BillDto() {
         products.add(new Product());
     }
-
-
-    /*int getId_bill();
-    boolean isClosed();
-    Shop getShop();
-    Account getAccount();
-    LocalDate getGroup_date();
-    Set<Product> getProducts();*/
-
 
 }

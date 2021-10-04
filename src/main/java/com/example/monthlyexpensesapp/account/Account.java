@@ -39,4 +39,7 @@ public class Account {
         account_name = source.account_name;
     }
 
+    void assaignId(int id) {
+        this.id_account=id;
+    }
 }

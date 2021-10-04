@@ -35,7 +35,7 @@ public class BillService {
     }
 
 
-    public Bill openbill(int id_shop, int id_account, LocalDate localDate) {
+    Bill openBill(int id_shop, int id_account, LocalDate localDate) {
 
         if (!accountRepository.existsById(id_account)) {
             throw new IllegalArgumentException("account does not exist");

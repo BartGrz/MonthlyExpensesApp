@@ -13,13 +13,13 @@
             <legend>Bill info</legend>
             <label>shop name
                 <select th:field="*{shop_name}">
-                    <option th:each="shop : ${shops}" th:value="${shop.getShop_name()}"
+                    <option th:each="shop : ${shops}" th:value="${shop.shop_name}"
                             th:text="${shop.getShop_name()}"/>
                 </select>
             </label>
             <label>account name
                 <select th:field="*{account_name}">
-                    <option th:each="account : ${accounts}" th:value="${account.getAccount_name()}"
+                    <option th:each="account : ${accounts}" th:value="${account.account_name}"
                             th:text="${account.getAccount_name()}"/>
                 </select>
             </label>

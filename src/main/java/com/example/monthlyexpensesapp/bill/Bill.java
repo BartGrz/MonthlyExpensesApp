@@ -6,6 +6,7 @@ import com.example.monthlyexpensesapp.shop.Shop;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import java.util.Set;
 @Entity
 @Table(name = "bill")
 @JsonIgnoreProperties(value = {"products"} )
-
 public class Bill {
 
     @Id
@@ -55,4 +55,14 @@ public class Bill {
        products=source.products;
     }
 
+    @Override
+    public String toString() {
+        return "Bill{" +
+                "id_bill=" + id_bill +
+                ", shop=" + shop.getShop_name() +
+                ", group_date=" + group_date +
+                ", closed=" + closed +
+                ", account=" + account.getAccount_name() +
+                '}';
+    }
 }

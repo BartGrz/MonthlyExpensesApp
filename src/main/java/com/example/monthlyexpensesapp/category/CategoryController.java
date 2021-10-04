@@ -1,5 +1,6 @@
 package com.example.monthlyexpensesapp.category;
 
+import com.example.monthlyexpensesapp.category.dto.CategoryDto;
 import com.example.monthlyexpensesapp.controllers.IllegalExceptionProcessing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +21,12 @@ public class CategoryController {
 
     private CategoryRepository categoryRepository;
     private CategoryService categoryService;
+    private CategoryQueryRepository categoryQueryRepository;
 
-    public CategoryController(CategoryRepository categoryRepository, CategoryService categoryService) {
+    public CategoryController(CategoryRepository categoryRepository, CategoryService categoryService, final CategoryQueryRepository categoryQueryRepository) {
         this.categoryRepository = categoryRepository;
         this.categoryService = categoryService;
+        this.categoryQueryRepository = categoryQueryRepository;
     }
 
     @GetMapping("/add-category")
@@ -51,46 +54,45 @@ public class CategoryController {
     }
 
     @GetMapping("/category")
-    ResponseEntity<List<Category>> readAll() {
-
-        return ResponseEntity.ok(categoryRepository.findAll());
+    ResponseEntity<List<CategoryDto>> readAll() {
+        return ResponseEntity.ok(categoryQueryRepository.findAllDtoBy());
     }
 
     @GetMapping("/category/{id}")
-    ResponseEntity<Category> readById(@PathVariable int id) {
-
-        if (!categoryRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        Category category = categoryRepository.findById(id).get();
-        return ResponseEntity.ok(category);
+    ResponseEntity<CategoryDto> readById(@PathVariable int id) {
+        return categoryQueryRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @ResponseBody
     @PostMapping(value = "/category", consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Category> createCategory(@RequestBody Category toCreate) {
-        Category category = categoryService.addNewCategory(toCreate);
+    ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto toCreate) {
+        var toBeCreated = CategoryFactory.from(toCreate);
+        Category category = categoryService.addNewCategory(toBeCreated);
         return ResponseEntity.created(URI.create("/" + category.getId_category())).body(toCreate);
 
     }
 
     @ResponseBody
     @PutMapping(value = "/category/{id}", produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Category> updateCategory(@RequestBody Category toUpdate, @PathVariable int id) {
+    ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto toUpdate, @PathVariable int id) {
 
-        categoryService.updateCategory(id, toUpdate);
+        var toBeUpdated=CategoryFactory.from(toUpdate);
+        categoryService.updateCategory(id, toBeUpdated);
 
         return ResponseEntity.noContent().build();
     }
 
     @ResponseBody
     @DeleteMapping("/category/{id}")
-    ResponseEntity<Category> deleteAccount(@PathVariable int id, Model model) {
+    ResponseEntity<Category> deleteAccount(@PathVariable int id) {
 
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
 
+    @ModelAttribute("categories")
     private List<Category> getCategories() {
         return categoryService.getCategories();
     }

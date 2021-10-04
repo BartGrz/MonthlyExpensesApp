@@ -1,5 +1,6 @@
 package com.example.monthlyexpensesapp.account;
 
+import com.example.monthlyexpensesapp.account.dto.AccountDto;
 import com.example.monthlyexpensesapp.controllers.IllegalExceptionProcessing;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,45 +13,41 @@ public class AccountController {
 
    private AccountRepository accountRepository;
    private AccountService accountService;
+   private AccountQueryRepository accountQueryRepository;
 
-    public AccountController(AccountRepository accountRepository, AccountService accountService) {
+    public AccountController(AccountRepository accountRepository, AccountService accountService, final AccountQueryRepository accountQueryRepository) {
         this.accountRepository = accountRepository;
         this.accountService = accountService;
+        this.accountQueryRepository = accountQueryRepository;
     }
 
     @GetMapping("/account")
-    ResponseEntity<List<Account>> readAll() {
+    ResponseEntity<List<AccountDto>> readAll() {
 
-        return ResponseEntity.ok(accountRepository.findAll());
+        return ResponseEntity.ok(accountQueryRepository.findAllDtoBy());
     }
 
     @GetMapping("/account/{id}")
-    ResponseEntity<Account> readByID(@PathVariable int id) {
+    ResponseEntity<AccountDto> readByID(@PathVariable int id) {
 
-        return accountRepository.findById(id).map(account ->
-                ResponseEntity.ok(account))
+        return accountQueryRepository.findBy(id)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/account")
-    ResponseEntity<Account> createAccount(@RequestBody Account toCreate) {
+    ResponseEntity<AccountDto> createAccount(@RequestBody AccountDto toCreate) {
 
-        Account result = accountService.creatingAccount(toCreate);
-
+        var toBeCreated = AccountFactory.from(toCreate);
+        Account result = accountService.creatingAccount(toBeCreated);
         return ResponseEntity.created(URI.create("/" + result.getId_account())).body(toCreate);
     }
 
     @PutMapping("/account/{id}")
-    ResponseEntity<Account> updateAccount(@RequestBody Account toUpdate, @PathVariable int id) {
+    ResponseEntity<AccountDto> updateAccount(@RequestBody AccountDto toUpdate, @PathVariable int id) {
 
-        if (!accountRepository.existsById(id)) {
-
-            return ResponseEntity.notFound().build();
-        }
-        accountRepository.findById(id).ifPresent(account -> {
-            account.updateFrom(toUpdate);
-            accountRepository.save(account);
-        });
+        var toBeUpdated = AccountFactory.from(toUpdate);
+        accountService.updateFrom(id,toBeUpdated);
 
         return ResponseEntity.noContent().build();
     }

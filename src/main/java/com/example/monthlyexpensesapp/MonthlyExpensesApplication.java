@@ -12,10 +12,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "com.example.monthlyexpensesapp.shop",
         "com.example.monthlyexpensesapp.product"
 })
-public class MonthlyexpensesappApplication {
+public class MonthlyExpensesApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MonthlyexpensesappApplication.class, args);
+        SpringApplication.run(MonthlyExpensesApplication.class, args);
     }
 
 }

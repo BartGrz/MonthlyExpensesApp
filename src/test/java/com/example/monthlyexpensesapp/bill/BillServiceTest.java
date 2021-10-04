@@ -1,7 +1,6 @@
 package com.example.monthlyexpensesapp.bill;
 
 import com.example.monthlyexpensesapp.account.AccountRepository;
-import com.example.monthlyexpensesapp.bill.dto.BillDto;
 import com.example.monthlyexpensesapp.product.ProductRepository;
 import com.example.monthlyexpensesapp.shop.ShopRepository;
 import com.example.monthlyexpensesapp.account.Account;
@@ -68,7 +67,7 @@ class BillServiceTest {
         assertEquals(bill.getId_bill(), 1);
 
         //under test
-        billService.openbill(1, 1,LocalDate.now());
+        billService.openBill(1, 1,LocalDate.now());
 
     }
 

@@ -124,6 +124,13 @@ public class AccountService {
         });
 
     }
-
+    public Account updateFrom(int id, Account toUpdate) {
+        if(!accountRepository.existsById(id)){
+            throw new IllegalArgumentException("no account with id:"+id + " found");
+        }
+        var account = accountRepository.findById(id).get();
+        account.updateFrom(toUpdate);
+        return account;
+    }
 }
 

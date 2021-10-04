@@ -12,8 +12,8 @@ import java.util.Optional;
 
 public interface  AccountRepository extends JpaRepository<Account, Integer> {
 
-    List<Account> findAll();
-    Optional<Account> findById(Integer integer);
+   /* List<Account> findAll();
+    Optional<Account> findById(Integer integer);*/
     Account save(Account entity);
     void delete(Account account);
     boolean existsById(Integer id);

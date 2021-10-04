@@ -88,7 +88,7 @@ class AddingBillController {
         });
         var account = accountService.getAccountByName(account_name).get();
         var shop = shopRepository.findByName(shop_name).get();
-        var bill = billService.openbill(shop.getId_shop(), account.getId_account(), LocalDate.parse(date));
+        var bill = billService.openBill(shop.getId_shop(), account.getId_account(), LocalDate.parse(date));
         bill.setProducts(new HashSet<>(products_list));
         products_list.forEach(product -> {
             product.setBill(bill);

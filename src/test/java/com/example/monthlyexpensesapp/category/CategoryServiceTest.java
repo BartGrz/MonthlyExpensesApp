@@ -3,9 +3,12 @@ package com.example.monthlyexpensesapp.category;
 import com.example.monthlyexpensesapp.category.CategoryRepository;
 import com.example.monthlyexpensesapp.category.CategoryService;
 import com.example.monthlyexpensesapp.category.Category;
+import com.example.monthlyexpensesapp.category.dto.CategoryDto;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -84,4 +87,5 @@ class CategoryServiceTest {
         when(repo.save(category)).thenReturn(category);
         assertDoesNotThrow(() -> new CategoryService(repo).updateCategory(1,toUpdate));
     }
+
 }

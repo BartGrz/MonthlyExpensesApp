@@ -50,7 +50,7 @@ class BillController {
 
     @PostMapping("/")
     ResponseEntity<Bill> openBill(@RequestBody BillDto toCreate, @RequestParam int id_shop, @RequestParam int id_account) {
-        var bill = billService.openbill(id_shop, id_account, LocalDate.parse(toCreate.getBill_date()));
+        var bill = billService.openBill(id_shop, id_account, LocalDate.parse(toCreate.getBill_date()));
         if (bill == null) {
             return ResponseEntity.badRequest().build();
         }
