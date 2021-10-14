@@ -1,8 +1,9 @@
 package com.example.monthlyexpensesapp.account;
 
-import com.example.monthlyexpensesapp.account.AccountService;
-import com.example.monthlyexpensesapp.account.AccountRepository;
-import com.example.monthlyexpensesapp.account.Account;
+import com.example.monthlyexpensesapp.account.accountBalance.AccountBalanceFacade;
+import com.example.monthlyexpensesapp.account.accountBalance.AccountBalanceRepository;
+import com.example.monthlyexpensesapp.account.accountDebt.AccountDebtFacade;
+import com.example.monthlyexpensesapp.account.accountDebt.AccountDebtRepository;
 import com.example.monthlyexpensesapp.bill.Bill;
 import com.example.monthlyexpensesapp.product.Product;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,8 @@ class AccountServiceTest {
     @Test
     void creatingAccountWithAddingItToAccountDebtTable() throws NoSuchFieldException, IllegalAccessException {
         var accountRepo = mock(AccountRepository.class);
+        var accountBalanceFacade = mock(AccountBalanceFacade.class);
+        var facade = mock(AccountDebtFacade.class);
         Account account = new Account();
         Field getId = account.getClass().getDeclaredField("id_account");
         getId.setAccessible(true);
@@ -30,7 +33,8 @@ class AccountServiceTest {
         when(accountRepo.save(account)).thenReturn(account);
         assertThat(account.getId_account()).isEqualTo(1);
 
-        AccountService accountService = new AccountService(accountRepo);
+
+        AccountService accountService = new AccountService(accountRepo, facade, accountBalanceFacade);
         assertDoesNotThrow(() -> accountService.creatingAccount(account));
     }
 
@@ -38,6 +42,8 @@ class AccountServiceTest {
     void creatingAccountWithAddingItToAccountDebtTable_throwingIllegalStateIfAccountExist() throws NoSuchFieldException, IllegalAccessException {
         var accountRepo = mock(AccountRepository.class);
         Account account = new Account();
+        var accountBalanceFacade = mock(AccountBalanceFacade.class);
+        var facade = mock(AccountDebtFacade.class);
         Field getId = account.getClass().getDeclaredField("id_account");
         getId.setAccessible(true);
         getId.set(account, 1);
@@ -47,7 +53,7 @@ class AccountServiceTest {
         when(accountRepo.existsById(1)).thenReturn(true);
         when(accountRepo.save(account)).thenReturn(account);
 
-        AccountService accountService = new AccountService(accountRepo);
+        AccountService accountService = new AccountService(accountRepo, facade, accountBalanceFacade);
        assertThrows(IllegalStateException.class,
                 () -> accountService.creatingAccount(account));
 
@@ -58,6 +64,8 @@ class AccountServiceTest {
     void checkIfUpdatingAccountsDebtAndBalance_working() throws NoSuchFieldException, IllegalAccessException {
         //given
         var accountRepo = mock(AccountRepository.class);
+        var accountBalanceFacade = mock(AccountBalanceFacade.class);
+        var facade = mock(AccountDebtFacade.class);
         Account account = new Account();
         Account account_2 = new Account();
         Bill bill = new Bill();
@@ -114,7 +122,7 @@ class AccountServiceTest {
         assertThat(account_2.getId_account()).isEqualTo(2);
 
         //udner test
-        AccountService service = new AccountService(accountRepo);
+        AccountService service = new AccountService(accountRepo, facade, accountBalanceFacade);
         assertDoesNotThrow(() -> service.updateAccount(1));
 
 
@@ -122,7 +130,9 @@ class AccountServiceTest {
     @Test
     void checkIfAutoCalcultaingOfAccountsDebt_working () throws NoSuchFieldException, IllegalAccessException {
         var accountRepository  = mock(AccountRepository.class);
-        AccountService accountService = new AccountService(accountRepository);
+        var accountBalanceFacade = mock(AccountBalanceFacade.class);
+        var facade = mock(AccountDebtFacade.class);
+        AccountService accountService = new AccountService(accountRepository, facade, accountBalanceFacade);
         Account account_1 = new Account();
         Account account_2 = new Account();
         Account account_3 = new Account();

@@ -2,9 +2,9 @@ package com.example.monthlyexpensesapp.category.dto;
 
 import com.example.monthlyexpensesapp.product.Product;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.ToString;
 
 
-import javax.swing.*;
 import java.util.Set;
 
 @JsonDeserialize(as = CategoryDto.DeserializeImp.class)
@@ -29,6 +29,14 @@ public interface CategoryDto {
             this.id_category = id_category;
             this.category_name = category_name;
             this.products = products;
+        }
+
+        @Override
+        public String toString() {
+            return "Category[DTO]{" +
+                    "id_category=" + id_category +
+                    ", category_name='" + category_name + '\'' +
+                    '}';
         }
 
         @Override

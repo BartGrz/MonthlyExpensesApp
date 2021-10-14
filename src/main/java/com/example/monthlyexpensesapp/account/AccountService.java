@@ -1,6 +1,14 @@
 package com.example.monthlyexpensesapp.account;
 
 
+import com.example.monthlyexpensesapp.account.accountBalance.AccountBalanceFacade;
+import com.example.monthlyexpensesapp.account.accountBalance.AccountBalanceFactory;
+import com.example.monthlyexpensesapp.account.accountBalance.AccountBalanceRepository;
+import com.example.monthlyexpensesapp.account.accountBalance.dto.AccountBalanceDto;
+import com.example.monthlyexpensesapp.account.accountDebt.AccountDebtFacade;
+import com.example.monthlyexpensesapp.account.accountDebt.AccountDebtFactory;
+import com.example.monthlyexpensesapp.account.accountDebt.AccountDebtRepository;
+import com.example.monthlyexpensesapp.account.accountDebt.dto.AccountDebtDto;
 import com.example.monthlyexpensesapp.bill.Bill;
 import com.example.monthlyexpensesapp.product.Product;
 import org.slf4j.Logger;
@@ -16,9 +24,14 @@ public class AccountService {
     private final static Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private AccountRepository accountRepository;
+    private AccountBalanceRepository accountBalanceRepository;
+    private final AccountDebtFacade accountDebtFacade;
+    private final AccountBalanceFacade updateBalanceForAccount;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, final AccountDebtFacade accountDebtFacade, AccountBalanceFacade updateBalanceForAccount) {
         this.accountRepository = accountRepository;
+        this.accountDebtFacade = accountDebtFacade;
+        this.updateBalanceForAccount = updateBalanceForAccount;
     }
 
 
@@ -44,6 +57,8 @@ public class AccountService {
             throw new IllegalStateException("Account already exist");
         }
         var accountCreated = accountRepository.save(account);
+        accountRepository.saveToAccountDebt(account.getId_account(),0,0);
+
         logger.info("Account " + accountCreated.getAccount_name() + " created");
         return accountCreated;
     }
@@ -66,8 +81,11 @@ public class AccountService {
                 .forEach(products -> {
                     var res = products.stream()
                             .mapToDouble(Product::getProduct_price).sum();
-                    accountRepository.updateAccountDebt(res, acc.getId_account(), id_account);
-                    logger.info("account debt with id:" + id_account + " has been updated");
+                    //FIXME: 2021-10-07
+                    //BEFORE : accountRepository.updateAccountDebt(res, acc.getId_account(), id_account);
+                    //test of new approach !!
+                    //NOW :
+                    updateBalanceForAccount.updateBalanceForAccount(account,res);
                 }));
 
         final double[] total_balance = {0};
@@ -80,8 +98,11 @@ public class AccountService {
                     total_balance[0] = res + total_balance[0];
                 });
 
-        accountRepository.updateAccountBalance(total_balance[0], id_account);
-        logger.info("account balance with id:" + id_account + " has been updated");
+        //FIXME: 2021-10-07
+        //BEFORE : accountRepository.updateAccountBalance(total_balance[0], id_account);
+        //test of new approach !!
+        //NOW :
+        updateBalanceForAccount.updateBalanceForAccount(account,total_balance[0]);
     }
 
     /**
@@ -115,11 +136,18 @@ public class AccountService {
 
             } else if (!accountRepository.existsById_debtor(account.getId_account(), bill.getAccount().getId_account())) {
                 var total = debt+accountRepository.getAccountDebtById(account.getId_account(),bill.getAccount().getId_account());
-                accountRepository.updateAccountDebt(total, bill.getAccount().getId_account(), account.getId_account());
-                logger.warn(  account.getAccount_name()  + "  owe " + total+ " int total to " + bill.getAccount().getAccount_name());
+                //TODO : previously
+                /*accountRepository.updateAccountDebt(total, bill.getAccount().getId_account(), account.getId_account());
+                    new code down here - using new repository
+                  */
+                accountDebtFacade.updateDebt(account,bill,total);
+                //logger.warn(  account.getAccount_name()  + "  owe " + total+ " in total to " + bill.getAccount().getAccount_name());
             } else {
-                accountRepository.saveToAccountDebt(account.getId_account(), bill.getAccount().getId_account(), debt);
-                logger.info("adding new debt , account : " + account.getAccount_name() + " owes  " + debt + " to " + bill.getAccount().getAccount_name());
+                //TODO : previously
+              /*  accountRepository.saveToAccountDebt(account.getId_account(), bill.getAccount().getId_account(), debt);*/
+                /*new code down here - using new repository */
+                accountDebtFacade.saveNewDebt(account,bill,debt);
+                //logger.info("adding new debt , account : " + account.getAccount_name() + " owes  " + debt + " to " + bill.getAccount().getAccount_name());
             }
         });
 
@@ -130,7 +158,33 @@ public class AccountService {
         }
         var account = accountRepository.findById(id).get();
         account.updateFrom(toUpdate);
-        return account;
+        var updated = accountRepository.save(account);
+        return updated;
+    }
+    //:FIXME
+    public void deleteAccount(int id_account){
+        if(!accountRepository.existsById(id_account)){
+            throw new IllegalArgumentException("no account with id:"+id_account + " found");
+        }
+        /*all of these should be managed by cascade delete (whenever the idAccount fk existed, that row will be deleted),still not working*/
+        accountRepository.deleteAccountDebtById(id_account);
+        accountRepository.deleteWholeDebt(id_account);
+        accountRepository.deleteFromBillHistory(id_account);
+        accountRepository.deleteFromProductHistory(id_account);
+        accountRepository.deleteById(id_account);
+
+
+
+    }
+    /**
+     * method should return map with accounts to which person owe money
+     * @param account
+     * @return
+     */
+    //TODO create method with instruction given above
+    Map<String,Double> getBalanceByAccount(Account account) {
+        Map<String,Double> balance = new HashMap<>();
+        return balance;
     }
 }
 

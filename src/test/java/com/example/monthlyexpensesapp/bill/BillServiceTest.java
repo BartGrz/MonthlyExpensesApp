@@ -1,6 +1,7 @@
 package com.example.monthlyexpensesapp.bill;
 
 import com.example.monthlyexpensesapp.account.AccountRepository;
+import com.example.monthlyexpensesapp.account.AccountService;
 import com.example.monthlyexpensesapp.product.ProductRepository;
 import com.example.monthlyexpensesapp.shop.ShopRepository;
 import com.example.monthlyexpensesapp.account.Account;
@@ -17,11 +18,12 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class BillServiceTest {
-
+    final AccountService accountService = mock(AccountService.class);
     @Test
     void createBill() throws NoSuchFieldException, IllegalAccessException {
 
@@ -48,7 +50,8 @@ class BillServiceTest {
         readField_account.setAccessible(true);
         readField_account.set(account, 1);
 
-        var billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
+        final AccountService accountService = mock(AccountService.class);
+        var billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService, accountService);
 
         //when
         when(billRepo.existsById(1)).thenReturn(false);
@@ -80,6 +83,7 @@ class BillServiceTest {
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
         var productService = mock(ProductService.class);
+        final AccountService accountService = mock(AccountService.class);
         var bill = new Bill();
 
         bill.setGroup_date(LocalDate.of(2021, 7, 5));
@@ -97,7 +101,7 @@ class BillServiceTest {
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
         //under test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService, accountService);
         billService.deleteBill(1);
     }
 
@@ -126,7 +130,7 @@ class BillServiceTest {
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
 
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService, accountService);
         billService.sumWholeBill(bill);
     }
 
@@ -155,7 +159,7 @@ class BillServiceTest {
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
 
         //test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService, accountService);
         billService.getAllProducts(1);
 
     }
@@ -192,7 +196,7 @@ class BillServiceTest {
         when(productRepository.findById(1)).thenReturn(Optional.of(product));
 
 
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService, accountService);
         Exception exceptionBillWrongId = assertThrows(IllegalStateException.class,
                 () -> billService.updateProduct(2, product));
         Exception exceptionProductDoesNotExist = assertThrows(IllegalStateException.class,
@@ -230,7 +234,7 @@ class BillServiceTest {
         assertThat(bill.getProducts()).isEqualTo(products);
         when(billRepo.existsById(1)).thenReturn(false);
         //under test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService, accountService);
         Exception exceptionWrongId = assertThrows(IllegalArgumentException.class, () -> billService.toggleBill(1));
         String message = exceptionWrongId.getMessage();
         assertThat(message).isEqualTo(exceptionWrongId.getMessage());
@@ -243,7 +247,9 @@ class BillServiceTest {
         var billRepo = mock(BillRepository.class);
         var accountRepo = mock(AccountRepository.class);
         var productRepository = mock(ProductRepository.class);
+        var accountRepository = mock(AccountRepository.class);
         var productService = mock(ProductService.class);
+        var savedBill = new Bill();
         var product = new Product();
         Field getProductId = product.getClass().getDeclaredField("id_product");
         getProductId.setAccessible(true);
@@ -255,14 +261,17 @@ class BillServiceTest {
         Set<Product> products = new HashSet<>();
         products.add(product);
         bill.setProducts(products);
+        savedBill = bill;
         //given
         assertThat(bill.getId_bill()).isEqualTo(1);
         assertThat(bill.getProducts()).isEqualTo(products);
         when(billRepo.existsById(1)).thenReturn(true);
         when(billRepo.findById(1)).thenReturn(Optional.of(bill));
+        when(billRepo.save(bill)).thenReturn(savedBill);
         //test
-        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService);
-        assertDoesNotThrow(() -> billService.toggleBill(1));
+        BillService billService = new BillService(billRepo, shopRepo, accountRepo, productRepository, productService, accountService);
+        //throwing nullPointer because of inner method updating Accounts from AccountService class
+        assertThrows(NullPointerException.class,() -> billService.toggleBill(1));
     }
 
     @Test

@@ -35,7 +35,13 @@ public class Account {
     }
 
     public void updateFrom(Account source) {
-        account_name = source.account_name;
+        this.account_name = source.account_name;
+    }
+
+    @Override
+    public String toString() {
+        return "{account_name='" + account_name + '\'' +
+                '}';
     }
 
     void assaignId(int id) {

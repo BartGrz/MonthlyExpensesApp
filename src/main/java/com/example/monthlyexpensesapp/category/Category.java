@@ -29,6 +29,11 @@ public class Category {
     @Setter
     private Set<Product> products;
 
+    @Override
+    public String toString() {
+        return "{category_name='" + category_name + '\'' +
+                '}';
+    }
 
     public void updateFrom(Category source) {
         category_name = source.category_name;

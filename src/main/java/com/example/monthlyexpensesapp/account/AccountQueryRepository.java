@@ -1,5 +1,6 @@
 package com.example.monthlyexpensesapp.account;
 
+import com.example.monthlyexpensesapp.account.accountBalance.dto.AccountBalanceDto;
 import com.example.monthlyexpensesapp.account.dto.AccountDto;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;

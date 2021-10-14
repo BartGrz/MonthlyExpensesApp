@@ -1,6 +1,8 @@
-package com.example.monthlyexpensesapp.account;
+package com.example.monthlyexpensesapp.account.accountBalance;
 
+import com.example.monthlyexpensesapp.account.Account;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,18 +13,31 @@ import java.util.Objects;
 public class AccountBalance {
 
     @EmbeddedId
+    @Getter
+    @Setter
     private AccountBalancePK id;
 
     @ManyToOne
     @JoinColumn(name = "id_account" , insertable = false ,updatable = false)
+    @Getter
+    @Setter
     private Account account;
 
+    @Override
+    public String toString() {
+        return "AccountBalance{" +
+                "id=" + id +
+                ", account=" + account +
+                '}';
+    }
 }
 @Embeddable
 class AccountBalancePK implements Serializable {
     @Getter
+    @Setter
     private int id_account ;
     @Getter
+    @Setter
     private double balance;
 
     @Override
@@ -36,5 +51,13 @@ class AccountBalancePK implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id_account, balance);
+    }
+
+    @Override
+    public String toString() {
+        return "AccountBalancePK{" +
+                "id_account=" + id_account +
+                ", balance=" + balance +
+                '}';
     }
 }

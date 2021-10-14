@@ -2,6 +2,7 @@ package com.example.monthlyexpensesapp.bill;
 
 
 import com.example.monthlyexpensesapp.account.AccountRepository;
+import com.example.monthlyexpensesapp.account.AccountService;
 import com.example.monthlyexpensesapp.product.Product;
 import com.example.monthlyexpensesapp.product.ProductRepository;
 import com.example.monthlyexpensesapp.product.ProductService;
@@ -23,15 +24,17 @@ public class BillService {
     private ShopRepository shopRepository;
     private ProductRepository productRepository;
     private ProductService productService;
+    private final AccountService accountService;
 
     public BillService(BillRepository billRepository, ShopRepository shopRepository,
                        AccountRepository accountRepository, ProductRepository productRepository,
-                       ProductService productService) {
+                       ProductService productService, final AccountService accountService) {
         this.billRepository = billRepository;
         this.shopRepository = shopRepository;
         this.accountRepository = accountRepository;
         this.productRepository = productRepository;
         this.productService = productService;
+        this.accountService = accountService;
     }
 
 
@@ -77,8 +80,10 @@ public class BillService {
      *
      * @param bill
      */
+    //TODO : AccountBalamnceFacade method in accountService need to changed,
+    // called to many times and calculating the same thing which is already done here
     public void sumWholeBill(Bill bill) {
-
+        logger.warn(""+bill.getProducts());
         if (bill.getProducts().isEmpty()) {
             throw new IllegalStateException("Bill does not have products");
         }
@@ -88,6 +93,7 @@ public class BillService {
         var sum = billRepository.getBillSumById(bill.getId_bill());
         // var balance = sum+ accountRepository.getAccountDebtById(bill.getAccount().getId_account());
         accountRepository.updateAccountBalance(sum, bill.getAccount().getId_account());
+       /* !! accountService.updateAccount(bill.getAccount().getId_account()); !! */
     }
 
     public List<Product> getAllProducts(int id_bill) {

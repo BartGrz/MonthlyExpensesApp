@@ -61,7 +61,7 @@ public class Bill {
                 "id_bill=" + id_bill +
                 ", shop=" + shop.getShop_name() +
                 ", group_date=" + group_date +
-                ", closed=" + closed +
+                ", closed=" + this.closed +
                 ", account=" + account.getAccount_name() +
                 '}';
     }
