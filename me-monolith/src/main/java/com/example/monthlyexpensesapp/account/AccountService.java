@@ -38,10 +38,11 @@ public class AccountService {
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
     }
+
     public Optional<Account> getAccountByName(String name) {
 
         var account = accountRepository.findByName(name).get();
-        if(Optional.of(account).isEmpty()) {
+        if (Optional.of(account).isEmpty()) {
             throw new IllegalArgumentException("category with given name does not exist");
         }
         return Optional.of(account);
@@ -49,6 +50,7 @@ public class AccountService {
 
     /**
      * creating new account based on body send from post method
+     *
      * @param account
      * @return created account
      */
@@ -57,7 +59,7 @@ public class AccountService {
             throw new IllegalStateException("Account already exist");
         }
         var accountCreated = accountRepository.save(account);
-        accountRepository.saveToAccountDebt(account.getId_account(),0,0);
+        accountRepository.saveToAccountDebt(account.getId_account(), 0, 0);
 
         logger.info("Account " + accountCreated.getAccount_name() + " created");
         return accountCreated;
@@ -67,44 +69,19 @@ public class AccountService {
      * updating whole account from the beginning, method more applicable for being a tool
      * method updateDebtOfAccounts and method summWholeBill from BillService class are better in use
      */
-    public void updateAccount(int id_account) {
-
+    public void updateAccount(int id_account, Bill bill) {
+        //FIXED: 2021-10-17
+        //NOW :
         if (!accountRepository.existsById(id_account)) {
             throw new IllegalArgumentException("account with given id : " + id_account + " does not exist");
         }
-        List<Account> accountList = accountRepository.findAll();
         var account = accountRepository.findById(id_account).get();
-        accountList.removeIf(acc -> acc.getId_account() == id_account);
-
-        accountList.forEach(acc -> acc.getBills().stream()
-                .map(Bill::getProducts)
-                .forEach(products -> {
-                    var res = products.stream()
-                            .mapToDouble(Product::getProduct_price).sum();
-                    //FIXME: 2021-10-07
-                    //BEFORE : accountRepository.updateAccountDebt(res, acc.getId_account(), id_account);
-                    //test of new approach !!
-                    //NOW :
-                    updateBalanceForAccount.updateBalanceForAccount(account,res);
-                }));
-
-        final double[] total_balance = {0};
-        account.getBills().stream()
-                .map(Bill::getProducts)
-                .forEach(products -> {
-                    var res = products.stream()
-                            .filter(product -> product.getAccount().getId_account() == id_account)
-                            .mapToDouble(Product::getProduct_price).sum();
-                    total_balance[0] = res + total_balance[0];
-                });
-
-        //FIXME: 2021-10-07
-        //BEFORE : accountRepository.updateAccountBalance(total_balance[0], id_account);
-        //test of new approach !!
-        //NOW :
-        updateBalanceForAccount.updateBalanceForAccount(account,total_balance[0]);
+        var balance = bill.getProducts()
+                .stream()
+                .mapToDouble(Product::getProduct_price)
+                .sum();
+        updateBalanceForAccount.updateBalanceForAccount(account, balance);
     }
-
     /**
      * based on bill given and list of accounts, method will calculate how much other accounts owe to the account which pay for bill.
      *
@@ -114,7 +91,8 @@ public class AccountService {
 
         Map<Integer, Set<Product>> productsMap = new HashMap<>();
         List<Account> accountList = accountRepository.findAll();
-        accountList.removeIf(account -> account.getId_account() == bill.getAccount().getId_account()); //removing account which pay for bill(because it is not needed for operations)
+        accountList.removeIf(account ->
+                account.getId_account() == bill.getAccount().getId_account()); //removing account which pay for bill(because it is not needed for operations)
         /**
          * filling the map with integer as key and set of products as value
          */
@@ -132,39 +110,38 @@ public class AccountService {
             var debt = productsMap.get(account.getId_account())
                     .stream().mapToDouble(Product::getProduct_price)
                     .sum();
-            if(debt==0) { //that means account is not mentioned on bill
+            if (debt == 0) { //that means account is not mentioned on bill
 
             } else if (!accountRepository.existsById_debtor(account.getId_account(), bill.getAccount().getId_account())) {
-                var total = debt+accountRepository.getAccountDebtById(account.getId_account(),bill.getAccount().getId_account());
-                //TODO : previously
-                /*accountRepository.updateAccountDebt(total, bill.getAccount().getId_account(), account.getId_account());
-                    new code down here - using new repository
-                  */
-                accountDebtFacade.updateDebt(account,bill,total);
-                //logger.warn(  account.getAccount_name()  + "  owe " + total+ " in total to " + bill.getAccount().getAccount_name());
+                var total = debt + accountRepository.getAccountDebtById(account.getId_account(), bill.getAccount().getId_account());
+                   /* new code down here - using new repository*/
+                accountDebtFacade.updateDebt(account, bill, total);
             } else {
-                //TODO : previously
-              /*  accountRepository.saveToAccountDebt(account.getId_account(), bill.getAccount().getId_account(), debt);*/
                 /*new code down here - using new repository */
-                accountDebtFacade.saveNewDebt(account,bill,debt);
-                //logger.info("adding new debt , account : " + account.getAccount_name() + " owes  " + debt + " to " + bill.getAccount().getAccount_name());
+                accountDebtFacade.saveNewDebt(account, bill, debt);
             }
         });
-
     }
+
     public Account updateFrom(int id, Account toUpdate) {
-        if(!accountRepository.existsById(id)){
-            throw new IllegalArgumentException("no account with id:"+id + " found");
+        if (!accountRepository.existsById(id)) {
+            throw new IllegalArgumentException("no account with id:" + id + " found");
         }
         var account = accountRepository.findById(id).get();
         account.updateFrom(toUpdate);
         var updated = accountRepository.save(account);
         return updated;
     }
+
     //:FIXME
-    public void deleteAccount(int id_account){
-        if(!accountRepository.existsById(id_account)){
-            throw new IllegalArgumentException("no account with id:"+id_account + " found");
+
+    /**
+     * deleting account with every constraints
+     * @param id_account
+     */
+    public void deleteAccount(int id_account) {
+        if (!accountRepository.existsById(id_account)) {
+            throw new IllegalArgumentException("no account with id:" + id_account + " found");
         }
         /*all of these should be managed by cascade delete (whenever the idAccount fk existed, that row will be deleted),still not working*/
         accountRepository.deleteAccountDebtById(id_account);
@@ -174,16 +151,17 @@ public class AccountService {
         accountRepository.deleteById(id_account);
 
 
-
     }
+
     /**
      * method should return map with accounts to which person owe money
+     *
      * @param account
      * @return
      */
     //TODO create method with instruction given above
-    Map<String,Double> getBalanceByAccount(Account account) {
-        Map<String,Double> balance = new HashMap<>();
+    Map<String, Double> getBalanceByAccount(Account account) {
+        Map<String, Double> balance = new HashMap<>();
         return balance;
     }
 }

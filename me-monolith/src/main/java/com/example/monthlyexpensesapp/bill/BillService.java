@@ -3,6 +3,8 @@ package com.example.monthlyexpensesapp.bill;
 
 import com.example.monthlyexpensesapp.account.AccountRepository;
 import com.example.monthlyexpensesapp.account.AccountService;
+import com.example.monthlyexpensesapp.billSum.BillSumFacade;
+import com.example.monthlyexpensesapp.billSum.dto.BillSumDto;
 import com.example.monthlyexpensesapp.product.Product;
 import com.example.monthlyexpensesapp.product.ProductRepository;
 import com.example.monthlyexpensesapp.product.ProductService;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,16 +28,18 @@ public class BillService {
     private ProductRepository productRepository;
     private ProductService productService;
     private final AccountService accountService;
+    private final BillSumFacade billSumFacade;
 
     public BillService(BillRepository billRepository, ShopRepository shopRepository,
                        AccountRepository accountRepository, ProductRepository productRepository,
-                       ProductService productService, final AccountService accountService) {
+                       ProductService productService, final AccountService accountService, final BillSumFacade billSumFacade) {
         this.billRepository = billRepository;
         this.shopRepository = shopRepository;
         this.accountRepository = accountRepository;
         this.productRepository = productRepository;
         this.productService = productService;
         this.accountService = accountService;
+        this.billSumFacade = billSumFacade;
     }
 
 
@@ -52,9 +57,8 @@ public class BillService {
         bill.setAccount(account);
         bill.setShop(shop);
         bill.setGroup_date(localDate);
+        bill.setProducts(new HashSet<>());
         var created = billRepository.save(bill);
-        billRepository.saveBilltoBillSum(created.getId_bill(), 0);
-        logger.info("bill created with id = " + created.getId_bill() + " with shop " + shop.getShop_name() + " account " + account.getAccount_name());
         return created;
     }
 
@@ -68,7 +72,7 @@ public class BillService {
         bill.getProducts().stream().forEach(product -> {
             productRepository.deleteById(product.getId_product());
         });
-        billRepository.deleteFromBillSumBillById(id_bill);
+        billSumFacade.deleteBillSum(id_bill);
         billRepository.deleteById(bill.getId_bill());
 
         logger.info("Bill removed with " + size + " products ");
@@ -83,17 +87,16 @@ public class BillService {
     //TODO : AccountBalamnceFacade method in accountService need to changed,
     // called to many times and calculating the same thing which is already done here
     public void sumWholeBill(Bill bill) {
-        logger.warn(""+bill.getProducts());
         if (bill.getProducts().isEmpty()) {
             throw new IllegalStateException("Bill does not have products");
         }
-        double res = bill.getProducts().stream().mapToDouble(value -> value.getProduct_price()).sum();
-        billRepository.sumAllAmongBill(res, bill.getId_bill());
+        billSumFacade.saveNewBillSum(bill);
         logger.info("sum for bill id = " + bill.getId_bill() + " updated");
-        var sum = billRepository.getBillSumById(bill.getId_bill());
-        // var balance = sum+ accountRepository.getAccountDebtById(bill.getAccount().getId_account());
+        //:TODO update accounts balances
+        //
+        accountService.updateAccount(bill.getAccount().getId_account(),bill);
+        var sum = billSumFacade.getSumBy(bill);
         accountRepository.updateAccountBalance(sum, bill.getAccount().getId_account());
-       /* !! accountService.updateAccount(bill.getAccount().getId_account()); !! */
     }
 
     public List<Product> getAllProducts(int id_bill) {
@@ -103,13 +106,7 @@ public class BillService {
         }
         var bill = billRepository.findById(id_bill).get();
         logger.info("returned list with " + bill.getProducts().size());
-
         return bill.getProducts().stream().collect(Collectors.toList());
-    }
-
-    public List<Bill> getAllBills() {
-
-        return billRepository.findAll();
     }
 
     public Bill getBill(int id) {
@@ -141,14 +138,12 @@ public class BillService {
         if (!billRepository.existsById(id_bill)) {
             throw new IllegalArgumentException("there is no bill with given id");
         }
-
         var bill = billRepository.findById(id_bill).get();
         if (bill.isClosed()) {
             throw new IllegalStateException("Bill is already closed");
         }
         bill.setClosed(true);
         var updated = billRepository.save(bill);
-        logger.info("Bill is closed successfully, sum will be calculated");
         sumWholeBill(updated);
     }
     public void addProductToExistingBill(Product toCreate, int id_category, int id_bill,int id_account) {
