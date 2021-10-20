@@ -1,0 +1,30 @@
+<!Doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<HEAD>
+    <link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
+</HEAD>
+<meta charset="UTF-8">
+<title>Title</title>
+</head>
+<body>
+<legend>Calculating Balance</legend>
+
+<fieldset>
+    <label>choose account</label>
+    <select id="id_account">
+        <option th:each="account : ${accounts}" th:text="${account.account_name}" th:value="${account.id_account}">
+        </option>
+    </select>
+    <input type="button" value="confirm" onclick="process()"/>
+</fieldset>
+</body>
+</html>
+
+<script>
+    function process() {
+        id = document.getElementById("id_account").value;
+        window.open("http://localhost:8080/balance/" + id);
+        alert(id)
+    }
+</script>

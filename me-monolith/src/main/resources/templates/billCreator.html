@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <title>Create and add bill</title>
+    <link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
+</head>
+<body>
+<main>
+    <h1 th:if="${message !=null}" th:text="${message}"></h1>
+    <form action="#" method="post" th:action="@{/create-bill}" th:object="${new_bill}">
+        <fieldset>
+            <legend>Bill info</legend>
+            <label>shop name
+                <select th:field="*{shop_name}">
+                    <option th:each="shop : ${shops}" th:value="${shop.shop_name}"
+                            th:text="${shop.getShop_name()}"/>
+                </select>
+            </label>
+            <label>account name
+                <select th:field="*{account_name}">
+                    <option th:each="account : ${accounts}" th:value="${account.account_name}"
+                            th:text="${account.getAccount_name()}"/>
+                </select>
+            </label>
+            <label>date
+                <select th:field="*{bill_date}">
+                    <option th:each="date : ${dates}" th:value="${date}"
+                            th:text="${date}"/>
+                </select>
+            </label>
+            <fieldset th:each="product, productStep : *{products}">
+                <legend th:text="|product ${productStep.index+1}|"/>
+                <lable>product name
+                    <input type="text" th:field="*{products[__${productStep.index}__].product_name}">
+                </lable>
+                <lable>note
+                    <input type="text" th:field="*{products[__${productStep.index}__].product_note}">
+                </lable>
+                <label>price
+                    <input type="number" th:field="*{products[__${productStep.index}__].product_price}">
+                </label>
+                <lable>category name
+                    <select th:field="*{products[__${productStep.index}__].category.category_name}">
+                        <option th:each="category : ${categories}" th:value="${category.getCategory_name()}"
+                                th:text="${category.getCategory_name()}"/>
+                    </select>
+                </lable>
+                <lable>account name
+                    <select th:field="*{products[__${productStep.index}__].account.account_name}">
+                        <option th:each="account : ${accounts}" th:value="${account.getAccount_name()}"
+                                th:text="${account.getAccount_name()}"/>
+                    </select>
+                </lable>
+            </fieldset>
+            <div>
+                <button type="submit" name="addProduct">+</button>
+            </div>
+        </fieldset>
+        <input type="submit" name="confirm" value="confirm">
+    </form>
+    <form action="#" method="get" th:action="@{/}">
+        <fieldset>
+            <label>Back to main page</label>
+            <button type="submit"><--</button>
+        </fieldset>
+    </form>
+</main>
+</body>
+</html>
+
+<!--"*{shops[__${shopSteps.index}__].getId_shop()}"!-->
+<!-- <input type="text" name="shop_name" th:field="*{shop_name}" >!-->

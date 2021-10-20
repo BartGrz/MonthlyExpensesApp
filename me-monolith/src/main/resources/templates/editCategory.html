@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<link rel="stylesheet" href="https://igoradamenko.github.io/awsm.css/css/awsm.min.css">
+<head>
+    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+</head>
+</head>
+<body>
+<main>
+    <form>
+        <legend>Updating category</legend>
+        <fieldset>
+            <label>Choose category to update
+                <select id="id_cat">
+                    <option th:each="cat : ${categories}" th:text="${cat.category_name}" th:value="${cat.id_category}"/>
+                </select>
+            </label>
+            <label>change to
+                <input type="text" id="name">
+            </label>
+        </fieldset>
+        <button value="confirm" onclick="updateMethod()">confirm</button>
+    </form>
+</main>
+</body>
+</html>
+<script>
+    class RequestsHttp {
+
+        // Make an HTTP PUT Request
+        async update(url) {
+            const categoryObject = {
+                id_category: document.getElementById("id_cat").value,
+                category_name: document.getElementById("name").value
+            }
+            // Awaiting fetch which contains
+            // method, headers and content-type
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+
+                body: JSON.stringify(categoryObject)
+            }).then(response => {
+                return response.json()
+            });
+        }
+
+        async refresh(url) {
+
+            // Awaiting fetch which contains
+            // method, headers and content-type
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            });
+        }
+    }
+
+    // Instantiating new EasyHTTP class
+    const http = new RequestsHttp;
+
+    // Update Post
+    function updateMethod() {
+        var link = 'http://localhost:8080/category/' + document.getElementById('id_cat').value;
+        http.update(link);
+        alert("category updated !")
+
+    }
+</script>
